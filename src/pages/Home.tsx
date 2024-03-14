@@ -1,5 +1,8 @@
 import React from 'react';
 import Button from '../components/Button';
+import Image from '../components/Image';
+import SubTitle from '../components/SubTitle';
+import Title from '../components/Title';
 import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL } from '../global/utils';
 
 interface IVerifyResponse {
@@ -37,10 +40,21 @@ export function Home() {
   }
 
   return (
-    <div>
-      <p className='font-poopins text-2xl text-center text-gray-600'>Welcome to the home page</p>
-      <Button title='Logout' onClick={handleLogout} />
-    </div>
+    <>
+      <Button title='Logout' onClick={handleLogout} active className='absolute top-5 left-10' />
+      <div className='flex flex-col items-center justify-center h-screen gap-4'>
+        <Title title='Escolha o espaço' />
+        <SubTitle title='Toque em um dos ambientes abaixo e comece a simular' />
+        <div className='grid grid-cols-2 gap-4 p-4 rounded-md'>
+          <Image url='../assets/enviroments/area_lazer.png' />
+          <Image url='../assets/enviroments/banheiro_lavabo.png' />
+          <Image url='../assets/enviroments/banheiro_social.png' />
+          <Image url='../assets/enviroments/cozinha.png' />
+          <Image url='../assets/enviroments/gourmet.png' />
+          <Image url='../assets/enviroments/sala_estar.png' />
+        </div>
+      </div>
+    </>
   );
 }
 
