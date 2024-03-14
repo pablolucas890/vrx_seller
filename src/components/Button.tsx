@@ -4,11 +4,12 @@ import React from 'react';
 import { MdNavigateNext } from 'react-icons/md';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  title: string;
   hasIcon?: boolean;
   active?: boolean;
 }
 
-export default function Button({ hasIcon, active, ...rest }: ButtonProps) {
+export default function Button({ title, hasIcon, active, ...rest }: ButtonProps) {
   const { className, ...props } = rest;
 
   return (
@@ -21,7 +22,7 @@ export default function Button({ hasIcon, active, ...rest }: ButtonProps) {
           className,
         )}
       >
-        <p className='font-bold'>Entrar</p>
+        <p className='font-bold'>{title}</p>
         {hasIcon && <MdNavigateNext className='text-white top-4 left-4 text-3xl ml-5' />}
       </button>
     </div>

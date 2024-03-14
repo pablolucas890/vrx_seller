@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import React from 'react';
-import { FaLock, FaUser } from 'react-icons/fa';
+import { FaLock, FaUnlock, FaUser } from 'react-icons/fa';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon: 'user' | 'lock';
@@ -8,8 +8,9 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export default function Input({ icon, active, ...rest }: InputProps) {
-  const Icon = icon === 'user' ? FaUser : FaLock;
-  const { className, ...props } = rest;
+  const { className, type, ...props } = rest;
+  const [passwordVisible, setPasswordVisible] = React.useState(false);
+  const Icon = icon === 'user' ? FaUser : passwordVisible ? FaUnlock : FaLock;
 
   return (
     <div className='relative'>
@@ -19,9 +20,13 @@ export default function Input({ icon, active, ...rest }: InputProps) {
           active ? 'text-blue-450' : 'text-gray-300',
           className,
         )}
+        type={icon === 'lock' ? (passwordVisible ? 'text' : 'password') : type}
         {...props}
       />
-      <Icon className={clsx('absolute top-4 left-4', active ? 'text-blue-450' : 'text-gray-300')} />
+      <Icon
+        onClick={() => icon == 'lock' && setPasswordVisible(!passwordVisible)}
+        className={clsx('absolute top-4 left-4', active ? 'text-blue-450' : 'text-gray-300')}
+      />
     </div>
   );
 }
