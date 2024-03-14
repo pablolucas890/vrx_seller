@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React from 'react';
 
 interface AnchorProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -5,8 +6,10 @@ interface AnchorProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
 }
 
 export default function Anchor({ title, ...rest }: AnchorProps) {
+  const { className, ...props } = rest;
+
   return (
-    <a {...rest} className='text-sm text-blue-500 font-bold'>
+    <a {...props} className={clsx('text-sm text-blue-500 font-bold', className)}>
       {title}
     </a>
   );

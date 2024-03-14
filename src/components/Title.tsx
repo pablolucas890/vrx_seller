@@ -1,11 +1,16 @@
+import clsx from 'clsx';
 import React from 'react';
 
-console.log(React.version);
-
-interface TitleProps {
+interface TitleProps extends React.HTMLAttributes<HTMLHeadingElement> {
   title: string;
 }
 
-export default function Title({ title }: TitleProps) {
-  return <h1 className='text-2xl font-bold text-blue-450'>{title}</h1>;
+export default function Title({ title, ...rest }: TitleProps) {
+  const { className, ...props } = rest;
+
+  return (
+    <h1 {...props} className={clsx('text-2xl font-bold text-blue-450', className)}>
+      {title}
+    </h1>
+  );
 }

@@ -1,11 +1,16 @@
+import clsx from 'clsx';
 import React from 'react';
 
-console.log(React.version);
-
-interface SubTitleProps {
+interface SubTitleProps extends React.HTMLAttributes<HTMLParagraphElement> {
   title: string;
 }
 
-export default function SubTitle({ title }: SubTitleProps) {
-  return <p className='text-sm text-blue-450'>{title}</p>;
+export default function SubTitle({ title, ...rest }: SubTitleProps) {
+  const { className, ...props } = rest;
+
+  return (
+    <p className={clsx('text-sm text-blue-450', className)} {...props}>
+      {title}
+    </p>
+  );
 }
