@@ -9,7 +9,7 @@ export default function SubTitle({ title, ...rest }: SubTitleProps) {
   const { className, ...props } = rest;
 
   return (
-    <p className={clsx('text-sm text-blue-450', className)} {...props}>
+    <p className={clsx('text-sm text-primary-450', className)} {...props}>
       {title}
     </p>
   );

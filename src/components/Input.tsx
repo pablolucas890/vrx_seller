@@ -16,8 +16,8 @@ export default function Input({ icon, active, ...rest }: InputProps) {
     <div className='relative'>
       <input
         className={clsx(
-          'text-center bg-gray-100 font-poopins p-3 border-gray-300 rounded-md border-0 w-200',
-          active ? 'text-blue-450' : 'text-gray-300',
+          'text-center bg-secondary-100 font-poopins p-3 border-secondary-300 rounded-md border-0 w-200',
+          active ? 'text-primary-450' : 'text-secondary-300',
           className,
         )}
         type={icon === 'lock' ? (passwordVisible ? 'text' : 'password') : type}
@@ -25,7 +25,7 @@ export default function Input({ icon, active, ...rest }: InputProps) {
       />
       <Icon
         onClick={() => icon == 'lock' && setPasswordVisible(!passwordVisible)}
-        className={clsx('absolute top-4 left-4', active ? 'text-blue-450' : 'text-gray-300')}
+        className={clsx('absolute top-4 left-4', active ? 'text-primary-450' : 'text-secondary-600')}
       />
     </div>
   );

@@ -9,7 +9,7 @@ export default function Anchor({ title, ...rest }: AnchorProps) {
   const { className, ...props } = rest;
 
   return (
-    <a {...props} className={clsx('text-sm text-blue-500 font-bold', className)}>
+    <a {...props} className={clsx('text-sm text-primary-500 font-bold', className)}>
       {title}
     </a>
   );

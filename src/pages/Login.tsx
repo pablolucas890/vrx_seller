@@ -54,7 +54,7 @@ export default function Login() {
       <div className='md:w-2/4 sm:w-full h-screen items-center justify-center flex'>
         <div className='gap-4'>
           <Title title='Login' className='mb-2' />
-          <SubTitle title='Por favor, isira abaixo seu usuário e senha' className='mb-4' />
+          <SubTitle title='Por favor, insira abaixo seu usuário e senha' className='mb-4' />
           <Input
             placeholder='E-mail'
             active={email != ''}

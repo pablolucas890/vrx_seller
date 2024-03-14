@@ -9,7 +9,7 @@ export default function Title({ title, ...rest }: TitleProps) {
   const { className, ...props } = rest;
 
   return (
-    <h1 {...props} className={clsx('text-2xl font-bold text-blue-450', className)}>
+    <h1 {...props} className={clsx('text-2xl font-bold text-primary-450', className)}>
       {title}
     </h1>
   );
