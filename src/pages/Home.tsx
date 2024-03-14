@@ -46,12 +46,12 @@ export function Home() {
         <Title title='Escolha o espaço' />
         <SubTitle title='Toque em um dos ambientes abaixo e comece a simular' />
         <div className='grid grid-cols-2 gap-4 p-4 rounded-md'>
-          <Image url='../assets/enviroments/area_lazer.png' />
-          <Image url='../assets/enviroments/banheiro_lavabo.png' />
-          <Image url='../assets/enviroments/banheiro_social.png' />
-          <Image url='../assets/enviroments/cozinha.png' />
-          <Image url='../assets/enviroments/gourmet.png' />
-          <Image url='../assets/enviroments/sala_estar.png' />
+          <Image url='../assets/img/enviroments/area_lazer.png' />
+          <Image url='../assets/img/enviroments/banheiro_lavabo.png' />
+          <Image url='../assets/img/enviroments/banheiro_social.png' />
+          <Image url='../assets/img/enviroments/cozinha.png' />
+          <Image url='../assets/img/enviroments/gourmet.png' />
+          <Image url='../assets/img/enviroments/sala_estar.png' />
         </div>
       </div>
     </>

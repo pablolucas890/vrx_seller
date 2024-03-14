@@ -15,7 +15,7 @@ export default function Login() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const login_image = '../assets/login_image.png';
+  const login_image = '../assets/img/login_image.png';
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
