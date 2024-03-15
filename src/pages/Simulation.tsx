@@ -54,12 +54,18 @@ export function Simulation() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
-    }).then(async res => {
-      if (!res.ok) window.location.href = '/';
-      const { decoded }: IVerifyResponse = await res.json();
-      // TODO: Fazer algo com o e-mail ou dados se for necessário
-      console.log(decoded);
-    });
+    })
+      .then(async res => {
+        if (!res.ok) window.location.href = '/';
+        const { decoded }: IVerifyResponse = await res.json();
+        // TODO: Fazer algo com o e-mail ou dados se for necessário
+        console.log(decoded);
+      })
+      .catch(err => {
+        console.error(err);
+        localStorage.removeItem('token');
+        window.location.href = '/';
+      });
   }
 
   return (

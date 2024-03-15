@@ -29,16 +29,21 @@ export default function Login() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
-    }).then(async res => {
-      if (res.ok) {
-        const { token }: ILoginResponse = await res.json();
-        if (token) {
-          alert('Login realizado com sucesso');
-          localStorage.setItem('token', token);
-          window.location.href = '/home';
+    })
+      .then(async res => {
+        if (res.ok) {
+          const { token }: ILoginResponse = await res.json();
+          if (token) {
+            alert('Login realizado com sucesso');
+            localStorage.setItem('token', token);
+            window.location.href = '/home';
+          } else alert('Erro ao realizar login');
         } else alert('Erro ao realizar login');
-      } else alert('Erro ao realizar login');
-    });
+      })
+      .catch(err => {
+        alert('Erro ao realizar login');
+        console.error(err);
+      });
   }
 
   return (
