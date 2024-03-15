@@ -1,9 +1,10 @@
+import clsx from 'clsx';
 import React from 'react';
 import Button from '../components/Button';
 import Image from '../components/Image';
 import SubTitle from '../components/SubTitle';
 import Title from '../components/Title';
-import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL } from '../global/utils';
+import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL, STRUCUTRE } from '../global/utils';
 
 interface IVerifyResponse {
   message: string;
@@ -14,6 +15,8 @@ interface IVerifyResponse {
   };
 }
 export function Home() {
+  const enviroments = STRUCUTRE.enviroments;
+
   React.useEffect(() => {
     verifyToken();
   }, []);
@@ -21,6 +24,12 @@ export function Home() {
   async function handleLogout() {
     localStorage.removeItem('token');
     window.location.href = '/';
+  }
+
+  async function handleEnv(enviroment: string) {
+    localStorage.setItem('enviroment', enviroment);
+    // TODO: Abrir o sketchup, colocar um loading e esperar um tempo antes de abrir a tela de simulação
+    window.location.href = '/simulation';
   }
 
   async function verifyToken() {
@@ -41,17 +50,20 @@ export function Home() {
 
   return (
     <>
-      <Button title='Logout' onClick={handleLogout} active className='absolute top-5 left-10' />
+      {/* TODO: Fazer botao de Upload textura se necessário*/}
+      <Button title='Sair' onClick={handleLogout} active className='absolute top-5 left-10 shadow-xl' />
       <div className='flex flex-col items-center justify-center h-screen gap-4'>
         <Title title='Escolha o espaço' />
         <SubTitle title='Toque em um dos ambientes abaixo e comece a simular' />
-        <div className='grid grid-cols-2 gap-4 p-4 rounded-md'>
-          <Image url='../assets/img/enviroments/area_lazer.png' />
-          <Image url='../assets/img/enviroments/banheiro_lavabo.png' />
-          <Image url='../assets/img/enviroments/banheiro_social.png' />
-          <Image url='../assets/img/enviroments/cozinha.png' />
-          <Image url='../assets/img/enviroments/gourmet.png' />
-          <Image url='../assets/img/enviroments/sala_estar.png' />
+        <div className='grid grid-cols-3 gap-4 p-4 rounded-md'>
+          {enviroments.map((env, index) => (
+            <Image
+              key={env.id}
+              url={`../assets/img/home_buttons/${env.id}.png`}
+              onClick={() => handleEnv(env.id)}
+              className={clsx(index === enviroments.length - 1 && enviroments.length % 3 != 0 && 'col-start-2')}
+            />
+          ))}
         </div>
       </div>
     </>
