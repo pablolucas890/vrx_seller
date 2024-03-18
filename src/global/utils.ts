@@ -6,11 +6,12 @@ export const SERVER_PROTOCOL = 'http';
 
 export const STRUCUTRE: IStructure = {
   materials: {
+    // TODO: Mudar o caminho para algo vinculado ao servidor da jadyla
+    materialsPath: 'assets/img/materials',
     textures: [
       { id: 'ARENA_35_ACETINADO', name: 'Arena 35 Acetinado' },
       { id: 'ARENA_35_POLIDO', name: 'Arena 35 Polido' },
       { id: 'BIANCO_35_ACETINADO', name: 'Bianco 35 Acetinado' },
-      { id: 'BIANCO_35_BRILHANTE', name: 'Bianco 35 Brilhante' },
       { id: 'BIANCO_35_BRILHANTE', name: 'Bianco 35 Brilhante' },
       { id: 'BIANCO_35_POLIDO', name: 'Biando 35 Polido' },
     ],

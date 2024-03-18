@@ -1,4 +1,5 @@
 export interface IMaterial {
+  materialsPath: string;
   textures: ITexture[];
 }
 

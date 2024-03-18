@@ -3,7 +3,7 @@ import React from 'react';
 import { FaLock, FaUnlock, FaUser } from 'react-icons/fa';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon: 'user' | 'lock';
+  icon?: 'user' | 'lock';
   active?: boolean;
 }
 
@@ -23,10 +23,12 @@ export default function Input({ icon, active, ...rest }: InputProps) {
         type={icon === 'lock' ? (passwordVisible ? 'text' : 'password') : type}
         {...props}
       />
-      <Icon
-        onClick={() => icon == 'lock' && setPasswordVisible(!passwordVisible)}
-        className={clsx('absolute top-4 left-4', active ? 'text-primary-450' : 'text-secondary-600')}
-      />
+      {icon && (
+        <Icon
+          onClick={() => icon == 'lock' && setPasswordVisible(!passwordVisible)}
+          className={clsx('absolute top-4 left-4', active ? 'text-primary-450' : 'text-secondary-600')}
+        />
+      )}
     </div>
   );
 }
