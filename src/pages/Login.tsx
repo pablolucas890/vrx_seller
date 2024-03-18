@@ -14,6 +14,7 @@ interface ILoginResponse {
 export default function Login() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [forgotPassword, setForgotPassword] = React.useState(false);
 
   const login_image = '../assets/img/login_image.png';
 
@@ -23,6 +24,21 @@ export default function Login() {
   }, []);
 
   async function handleLogin() {
+    if (forgotPassword && email !== '') {
+      await fetch(`${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/forgot/${email}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      })
+        .then(async res => {
+          if (res.ok) {
+            alert('Nosso time de suporte entrará em contato');
+            window.location.href = '/';
+          } else alert('Erro interno do servidor');
+        })
+        .catch(() => {
+          alert('Erro interno do servidor');
+        });
+    }
     if (!email || !password) return;
 
     await fetch(`${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/auth`, {
@@ -40,9 +56,8 @@ export default function Login() {
           } else alert('Erro ao realizar login');
         } else alert('Erro ao realizar login');
       })
-      .catch(err => {
+      .catch(() => {
         alert('Erro ao realizar login');
-        console.error(err);
       });
   }
 
@@ -58,8 +73,8 @@ export default function Login() {
       />
       <div className='md:w-2/4 sm:w-full h-screen items-center justify-center flex'>
         <div className='gap-4'>
-          <Title title='Login' className='mb-2' />
-          <SubTitle title='Por favor, insira abaixo seu usuário e senha' className='mb-4' />
+          <Title title={forgotPassword ? 'Esqueceu a senha?' : 'Login'} className='mb-2' />
+          <SubTitle title='Por favor, insira abaixo seu e-mail' className='mb-4' />
           <Input
             placeholder='E-mail'
             active={email != ''}
@@ -69,26 +84,30 @@ export default function Login() {
             onChange={e => setEmail(e.target.value)}
             className='mb-4'
           />
-          <Input
-            placeholder='Senha'
-            active={password !== ''}
-            icon='lock'
-            type='password'
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className='mb-6'
-          />
+          {!forgotPassword && (
+            <Input
+              placeholder='Senha'
+              active={password !== ''}
+              icon='lock'
+              type='password'
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              className='mb-6'
+            />
+          )}
           <Button
             onClick={handleLogin}
             hasIcon
-            active={email !== '' && password !== ''}
-            title='Entrar'
+            active={forgotPassword ? email !== '' : email !== '' && password !== ''}
+            title={forgotPassword ? 'Recuperar' : 'Entrar'}
             className='float-right mb-6'
           />
           <div className='flex float-right'>
-            <SubTitle title='Esqueceu sua senha?' className='mr-2' />
-            {/* TODO: Fazer função de esqueci a senha */}
-            <Anchor title='Clique Aqui' href='#' />
+            <SubTitle title={'Esqueceu sua senha?'} className='mr-2' />
+            <Anchor
+              title={forgotPassword ? 'Voltar para o Login' : 'Clique Aqui'}
+              onClick={() => setForgotPassword(!forgotPassword)}
+            />
           </div>
         </div>
       </div>
