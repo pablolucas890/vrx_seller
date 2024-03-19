@@ -146,10 +146,10 @@ export function Simulation() {
         )}
         {touchSelected && (
           <div className='absolute w-80 bg-white h-screen right-0 px-4 py-10 items-center flex flex-col justify-between z-20'>
-            <SubTitle title='Lista de texturas' className='font-bold cursor-pointer text-center' />
+            <SubTitle title='Lista de texturas' className='font-bold cursor-pointer text-center mb-4' />
             <Input
               placeholder='Buscar...'
-              className='w-full rounded-2xl'
+              className='w-full rounded-2xl mb-4'
               onChange={e => handleFilterTextures(e.target.value)}
             />
             <div className='overflow-y-auto h-[600px] w-full'>
@@ -169,7 +169,7 @@ export function Simulation() {
             </div>
             <Button
               title='Aplicar'
-              className='w-full'
+              className='w-full mb-4'
               active={textureSelected != undefined}
               onClick={() => handleUpdateGlass('client')}
             />
