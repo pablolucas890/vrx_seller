@@ -48,7 +48,22 @@
 
 ## Production
 
-- Build docker
-  - `docker build -t registry.example.com/group/project/image .`
-- Push Docker
-  - `docker push registry.example.com/group/project/image`
+- Build React App:
+    - `npm run build`
+- Generate installer file with electron:
+    - `npm run pack:linux|win`
+
+### Shell process
+
+- Install and execute Apache
+- Configure Rules at `/etc/apache2/sites-available/000-default.conf` with:
+    ```
+    <Directory "/var/www/html">
+        RewriteEngine on
+        RewriteCond %{REQUEST_FILENAME} -f [OR]
+        RewriteCond %{REQUEST_FILENAME} -d
+        RewriteRule ^ - [L]
+        RewriteRule ^ index.html [L]
+    </Directory>
+    ```
+- Copy public files to `www` folder
