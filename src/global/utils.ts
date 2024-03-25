@@ -1,13 +1,15 @@
 import { IStructure } from './props';
 
 // TODO: Mudar as configurações para as do servidor na aws
-export const SERVER_PORT = 8080;
-export const SERVER_HOST = '0.0.0.0';
-export const SERVER_PROTOCOL = 'http';
+export const API_SERVER_PORT = 8080;
+export const API_SERVER_HOST = '192.168.68.131';
+export const API_SERVER_PROTOCOL = 'http';
+export const SKETCHUP_SERVER_PORT = 4567;
+export const SKETCHUP_SERVER_HOST = 'localhost';
+export const SKETCHUP_SERVER_PROTOCOL = 'http';
 
 export const STRUCUTRE: IStructure = {
   materials: {
-    // TODO: Mudar o caminho para algo vinculado ao servidor da jadyla
     materialsPath: 'assets/img/materials',
     textures: [
       { id: 'ARENA_35_ACETINADO', name: 'Arena 35 Acetinado' },
@@ -26,7 +28,7 @@ export const STRUCUTRE: IStructure = {
           id: 'view1',
           name: 'Frontal',
           touchs: [
-            { id: 'touch1', x: '27%', y: '25%' },
+            { id: 'touch1', x: '65%', y: '70%' },
             { id: 'touch2', x: '47%', y: '5%' },
           ],
         },
@@ -34,8 +36,8 @@ export const STRUCUTRE: IStructure = {
           id: 'view2',
           name: 'Lateral',
           touchs: [
-            { id: 'touch1', x: '10%', y: '10%' },
-            { id: 'touch2', x: '47%', y: '5%' },
+            { id: 'touch1', x: '65%', y: '46%' },
+            { id: 'touch3', x: '20%', y: '60%' },
           ],
         },
       ],

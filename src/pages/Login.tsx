@@ -4,7 +4,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import SubTitle from '../components/SubTitle';
 import Title from '../components/Title';
-import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL } from '../global/utils';
+import { API_SERVER_HOST, API_SERVER_PORT, API_SERVER_PROTOCOL } from '../global/utils';
 
 interface ILoginResponse {
   message: string;
@@ -25,7 +25,7 @@ export default function Login() {
 
   async function handleLogin() {
     if (forgotPassword && email !== '') {
-      await fetch(`${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/forgot/${email}`, {
+      await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/forgot/${email}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
@@ -41,7 +41,7 @@ export default function Login() {
     }
     if (!email || !password) return;
 
-    await fetch(`${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/auth`, {
+    await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/auth`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),

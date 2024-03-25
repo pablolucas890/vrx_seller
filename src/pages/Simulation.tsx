@@ -7,7 +7,15 @@ import Input from '../components/Input';
 import Loading from '../components/Loading';
 import SubTitle from '../components/SubTitle';
 import { ITexture, ITouch, IView } from '../global/props';
-import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL, STRUCUTRE } from '../global/utils';
+import {
+  API_SERVER_HOST,
+  API_SERVER_PORT,
+  API_SERVER_PROTOCOL,
+  SKETCHUP_SERVER_HOST,
+  SKETCHUP_SERVER_PORT,
+  SKETCHUP_SERVER_PROTOCOL,
+  STRUCUTRE,
+} from '../global/utils';
 
 const enviroments = STRUCUTRE.enviroments;
 
@@ -29,6 +37,17 @@ export function Simulation() {
   const [touchSelected, setTouchSelected] = React.useState<ITouch>();
   const [textureSelected, setTextureSelected] = React.useState<ITexture>();
   const [textures, setTextures] = React.useState<ITexture[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [imageTimestamp, setImageTimestamp] = React.useState(Date.now());
+
+  // TODO: Ficar pingando no sketchup para verificar se ele esta aberto
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setImageTimestamp(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval); // Limpa o intervalo
+  }, []);
 
   React.useEffect(() => {
     setEnviroment(localStorage.getItem('enviroment') || '');
@@ -48,19 +67,29 @@ export function Simulation() {
     });
   }, [enviroment, enviroments]);
 
-  function handleHome() {
+  async function handleHome() {
     localStorage.removeItem('enviroment');
+    await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/close_sketchup`);
     window.location.href = '/home';
   }
 
   async function handleUpdateGlass(type: 'client' | 'client_and_seller') {
-    if (!textureSelected || !touchSelected) return;
-    // TODO: Implementar loading
     if (type === 'client') {
-      // TODO: passar o touchSelected e textureSelected para o servidor
+      if (!textureSelected || !touchSelected) return;
+      setLoading(true);
+      await fetch(
+        `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/texture?texture=${textureSelected.id}&touch=${touchSelected.id}`,
+      );
+      await new Promise(r => setTimeout(r, 200));
     } else if (type === 'client_and_seller') {
-      // TODO: passar o touchSelected, viewSelected e textureSelected para o servidor
+      // TODO: Fechar o loading quando a imagem for alterada
+      setLoading(true);
+      await fetch(
+        `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
+      );
+      await new Promise(r => setTimeout(r, 10000));
     }
+    setLoading(false);
   }
 
   function handleCancelSelect() {
@@ -82,7 +111,7 @@ export function Simulation() {
     const token = localStorage.getItem('token');
     if (!token) window.location.href = '/';
 
-    await fetch(`${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/verify`, {
+    await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
@@ -90,7 +119,6 @@ export function Simulation() {
       .then(async res => {
         if (!res.ok) window.location.href = '/';
         const { decoded }: IVerifyResponse = await res.json();
-        // TODO: Fazer algo com o e-mail ou dados se for necessário
         console.log(decoded);
       })
       .catch(() => {
@@ -99,7 +127,7 @@ export function Simulation() {
       });
   }
   return (
-    <Loading>
+    <Loading isLoading={loading}>
       <div className='flex'>
         <IoMenu
           className='absolute left-10 top-10 text-4xl text-white bg-primary-500 rounded-3xl p-1 z-20'
@@ -137,7 +165,7 @@ export function Simulation() {
         {enviroment && (
           <div className='flex'>
             <img
-              src={`../assets/img/prints/${enviroment}-${viewSelected?.id}.png`}
+              src={`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${imageTimestamp}`}
               alt='enviroment'
               className='h-screen w-full z-10'
               onClick={handleCancelSelect}

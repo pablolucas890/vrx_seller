@@ -32,6 +32,7 @@ function createWindow () {
 
 app.whenReady().then(async ()=> {
   try {
+    // TODO: Verificar se o skectchup esta instalado antes de prosseguir
     const scriptPath = process.platform == 'win32' ? 'win.bat' : 'linux.sh';
     const apache_conf_folder = process.platform == 'win32' ?
       '%USERPROFILE%\\AppData\\Roaming\\Apache24\\conf'

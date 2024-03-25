@@ -5,7 +5,15 @@ import Image from '../components/Image';
 import Loading from '../components/Loading';
 import SubTitle from '../components/SubTitle';
 import Title from '../components/Title';
-import { SERVER_HOST, SERVER_PORT, SERVER_PROTOCOL, STRUCUTRE } from '../global/utils';
+import {
+  API_SERVER_HOST,
+  API_SERVER_PORT,
+  API_SERVER_PROTOCOL,
+  SKETCHUP_SERVER_HOST,
+  SKETCHUP_SERVER_PORT,
+  SKETCHUP_SERVER_PROTOCOL,
+  STRUCUTRE,
+} from '../global/utils';
 
 interface IVerifyResponse {
   message: string;
@@ -17,6 +25,7 @@ interface IVerifyResponse {
 }
 export function Home() {
   const enviroments = STRUCUTRE.enviroments;
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
     verifyToken();
@@ -28,16 +37,27 @@ export function Home() {
   }
 
   async function handleEnv(enviroment: string) {
+    setLoading(true);
     localStorage.setItem('enviroment', enviroment);
-    // TODO: Abrir o sketchup, colocar um loading e esperar um tempo antes de abrir a tela de simulação
-    window.location.href = '/simulation';
+    try {
+      await fetch(
+        `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/open_sketchup?project=${enviroment}`,
+      );
+      await new Promise(r => setTimeout(r, 20000));
+      setLoading(false);
+      window.location.href = '/simulation';
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+      window.location.href = '/';
+    }
   }
 
   async function verifyToken() {
     const token = localStorage.getItem('token');
     if (!token) window.location.href = '/';
 
-    await fetch(`${SERVER_PROTOCOL}://${SERVER_HOST}:${SERVER_PORT}/verify`, {
+    await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/verify`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token }),
@@ -45,7 +65,6 @@ export function Home() {
       .then(async res => {
         if (!res.ok) window.location.href = '/';
         const { decoded }: IVerifyResponse = await res.json();
-        // TODO: Fazer algo com o e-mail ou dados se for necessário
         console.log(decoded);
       })
       .catch(err => {
@@ -56,7 +75,7 @@ export function Home() {
   }
 
   return (
-    <Loading>
+    <Loading isLoading={loading}>
       {/* TODO: Fazer botao de Upload textura se necessário*/}
       <Button title='Sair' onClick={handleLogout} active className='absolute top-5 left-10 shadow-xl' />
       <div className='flex flex-col items-center justify-center h-screen gap-4'>

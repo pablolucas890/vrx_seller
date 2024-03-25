@@ -24,6 +24,14 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Chocolatey ja esta instalado
 )
 
+REM TODO: Instalar ruby
+REM TODO: Iniciar API em ruby
+REM TODO: Enviar Materials em png pra pasta de Materials do sketchup
+REM TODO: Fazer Download do projeto do plugin no github e enviar para a pasta Plugins
+REM TODO: Fazer Download dos enviroments e enviar para a pasta do sketchup
+REM TODO: Dividir as execucos em partes de forma a retornar pro usuario o processo em um HTML
+REM TODO: Criar um script de clean para limpar instalacoes mal sucedidas
+
 REM Install Apache
 dir %APACHE_CONF_FOLDER% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
