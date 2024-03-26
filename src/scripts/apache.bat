@@ -1,6 +1,5 @@
 @echo off
 
-REM Consts Definitions
 set "SCRIPT_DIR=%~dp0"
 cd /d "%SCRIPT_DIR%"
 cd ..
@@ -10,7 +9,6 @@ set APACHE_BIN_FILE=%USERPROFILE%\AppData\Roaming\Apache24\bin\httpd.exe
 set APACHE_CONF_FOLDER=%USERPROFILE%\AppData\Roaming\Apache24\conf
 set HTTPD_CONF_FILE=%APACHE_CONF_FOLDER%\httpd.conf
 
-REM Install Chocolatey
 where choco >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Chocolatey
@@ -24,15 +22,6 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Chocolatey ja esta instalado
 )
 
-REM TODO: Instalar ruby
-REM TODO: Iniciar API em ruby
-REM TODO: Enviar Materials em png pra pasta de Materials do sketchup
-REM TODO: Fazer Download do projeto do plugin no github e enviar para a pasta Plugins
-REM TODO: Fazer Download dos enviroments e enviar para a pasta do sketchup
-REM TODO: Dividir as execucos em partes de forma a retornar pro usuario o processo em um HTML
-REM TODO: Criar um script de clean para limpar instalacoes mal sucedidas
-
-REM Install Apache
 dir %APACHE_CONF_FOLDER% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Apache HTTPD
@@ -48,11 +37,9 @@ IF %ERRORLEVEL% NEQ 0 (
     exit 1
 )
 
-REM Copia os arquivos da build para o diretorio do Apache
 echo - Copiando os arquivos da build para o diretorio do Apache
 xcopy /s /y "%OLD_DIR%\build\" "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\" >NUL 2>&1
 
-REM Configura o config do Apache
 findstr /c:"# VRX Configs" %HTTPD_CONF_FILE% > nul || (
     echo - Reescrevendo configuracoes do httpd
     echo # VRX Configs >> %HTTPD_CONF_FILE%
@@ -82,4 +69,4 @@ IF "%PID%"=="" (
 %APACHE_BIN_FILE% -k restart
 
 echo - FIM DO SCRIPT
-exit 0
+:end

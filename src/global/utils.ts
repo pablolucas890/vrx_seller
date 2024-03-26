@@ -17,6 +17,7 @@ export const STRUCUTRE: IStructure = {
       { id: 'BIANCO_35_ACETINADO', name: 'Bianco 35 Acetinado' },
       { id: 'BIANCO_35_BRILHANTE', name: 'Bianco 35 Brilhante' },
       { id: 'BIANCO_35_POLIDO', name: 'Biando 35 Polido' },
+      { id: 'ARANHA', name: 'Aranha' },
     ],
   },
   enviroments: [

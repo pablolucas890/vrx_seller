@@ -25,10 +25,11 @@ interface IVerifyResponse {
 }
 export function Home() {
   const enviroments = STRUCUTRE.enviroments;
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     verifyToken();
+    verifySketchup();
   }, []);
 
   async function handleLogout() {
@@ -43,7 +44,7 @@ export function Home() {
       await fetch(
         `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/open_sketchup?project=${enviroment}`,
       );
-      await new Promise(r => setTimeout(r, 20000));
+      await new Promise(r => setTimeout(r, 2000));
       setLoading(false);
       window.location.href = '/simulation';
     } catch (e) {
@@ -72,6 +73,14 @@ export function Home() {
         localStorage.removeItem('token');
         window.location.href = '/';
       });
+  }
+
+  async function verifySketchup() {
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 3000));
+    console.log('Fechando sketchup');
+    await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/close_sketchup`);
+    setLoading(false);
   }
 
   return (

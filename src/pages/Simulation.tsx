@@ -1,3 +1,5 @@
+// TODO: Relacionar a textura setada com o touch para o usuario poder navegar
+// TODO: Sempre que carregar, sincronizar o print inicial?
 import clsx from 'clsx';
 import React from 'react';
 import { IoMenu } from 'react-icons/io5';
@@ -37,16 +39,21 @@ export function Simulation() {
   const [touchSelected, setTouchSelected] = React.useState<ITouch>();
   const [textureSelected, setTextureSelected] = React.useState<ITexture>();
   const [textures, setTextures] = React.useState<ITexture[]>([]);
-  const [loading, setLoading] = React.useState(false);
-  const [imageTimestamp, setImageTimestamp] = React.useState(Date.now());
+  const [envLoading, setEnvLoading] = React.useState(true);
+  const [textureLoading, setTextureLoading] = React.useState(false);
+  const [imageTimestamp, setImageTimestamp] = React.useState('');
 
-  // TODO: Ficar pingando no sketchup para verificar se ele esta aberto
   React.useEffect(() => {
-    const interval = setInterval(() => {
-      setImageTimestamp(Date.now());
-    }, 1000);
+    const interval = setInterval(async () => {
+      await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/is_model_open`).then(
+        async res => {
+          const is_model_open = await res.json();
+          setEnvLoading(!is_model_open);
+        },
+      );
+    }, 1500);
 
-    return () => clearInterval(interval); // Limpa o intervalo
+    return () => clearInterval(interval);
   }, []);
 
   React.useEffect(() => {
@@ -63,33 +70,67 @@ export function Simulation() {
       if (env.id === enviroment) {
         setViews(env.views);
         setViewSelected(env.views[0]);
+        setImageTimestamp(`../assets/img/prints/${enviroment}-${env.views[0]?.id}.png?${Date.now()}`);
       }
     });
   }, [enviroment, enviroments]);
 
+  const fetchImageTimestamp = async (imageSrc: string) => {
+    try {
+      const response = await fetch(imageSrc, { method: 'HEAD' });
+      return response.headers.get('Last-Modified') || '';
+    } catch (error) {
+      console.error('Erro ao obter o timestamp da imagem:', error);
+      return '';
+    }
+  };
+
+  const waitForImageUpdate = async (imageSrc: string, oldTimestamp: string, timeout = 30000, interval = 1000) => {
+    const startTime = Date.now();
+
+    return new Promise<void>((resolve, reject) => {
+      const checkUpdate = async () => {
+        const newTimestamp = await fetchImageTimestamp(imageSrc);
+        console.log(newTimestamp, oldTimestamp);
+        if (newTimestamp !== oldTimestamp) {
+          resolve();
+        } else if (Date.now() - startTime > timeout) {
+          reject(new Error('Timeout na espera pela atualização da imagem'));
+          // TODO: Na primeira vez as vezes nao aplica, talvez recarregar a pagina?
+        } else {
+          setTimeout(checkUpdate, interval);
+        }
+      };
+
+      checkUpdate();
+    });
+  };
+
   async function handleHome() {
     localStorage.removeItem('enviroment');
-    await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/close_sketchup`);
     window.location.href = '/home';
   }
 
   async function handleUpdateGlass(type: 'client' | 'client_and_seller') {
     if (type === 'client') {
       if (!textureSelected || !touchSelected) return;
-      setLoading(true);
+      setTextureLoading(true);
       await fetch(
         `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/texture?texture=${textureSelected.id}&touch=${touchSelected.id}`,
       );
       await new Promise(r => setTimeout(r, 200));
     } else if (type === 'client_and_seller') {
-      // TODO: Fechar o loading quando a imagem for alterada
-      setLoading(true);
+      setTextureLoading(true);
+      const imageSrc = imageTimestamp;
+      const oldTimeStamp = await fetchImageTimestamp(imageSrc);
       await fetch(
         `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
       );
-      await new Promise(r => setTimeout(r, 10000));
+      await waitForImageUpdate(imageSrc, oldTimeStamp);
+      await new Promise(r => setTimeout(r, 3500));
+      setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
     }
-    setLoading(false);
+    setTextureLoading(false);
   }
 
   function handleCancelSelect() {
@@ -127,7 +168,7 @@ export function Simulation() {
       });
   }
   return (
-    <Loading isLoading={loading}>
+    <Loading isLoading={envLoading || textureLoading}>
       <div className='flex'>
         <IoMenu
           className='absolute left-10 top-10 text-4xl text-white bg-primary-500 rounded-3xl p-1 z-20'
@@ -138,6 +179,7 @@ export function Simulation() {
           <SubTitle
             title='Mudar posição da área atual ▼'
             className='font-bold cursor-pointer'
+            // TODO: Ao mudar a view, sincronizar o print?
             onClick={() => setSelectViewOpen(!selectViewOpen)}
           />
           {selectViewOpen &&
@@ -149,7 +191,10 @@ export function Simulation() {
                   'ml-4 font-bold cursor-pointer mt-4',
                   viewSelected?.id === view.id && 'text-primary-500',
                 )}
-                onClick={() => setViewSelected(view)}
+                onClick={() => {
+                  setViewSelected(view);
+                  setImageTimestamp(`../assets/img/prints/${enviroment}-${view?.id}.png?${Date.now()}`);
+                }}
               />
             ))}
         </dialog>
@@ -164,12 +209,7 @@ export function Simulation() {
         ))}
         {enviroment && (
           <div className='flex'>
-            <img
-              src={`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${imageTimestamp}`}
-              alt='enviroment'
-              className='h-screen w-full z-10'
-              onClick={handleCancelSelect}
-            />
+            <img src={imageTimestamp} alt='enviroment' className='h-screen w-full z-10' onClick={handleCancelSelect} />
           </div>
         )}
         {touchSelected && (
