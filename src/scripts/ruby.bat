@@ -23,7 +23,7 @@ IF %ERRORLEVEL% NEQ 0 (
 
 echo - Copiando os arquivos de materiais
 for /D %%D in ("%SKETCHUP_BASE_FOLDER%*") do (
-    xcopy "%OLD_DIR%\build\assets\img\materials\*" "%%D\SketchUp\Materials" /E /I /Y
+    xcopy "%OLD_DIR%\build\assets\img\materials\*" "%%D\SketchUp\Materials" /E /I /Y >NUL 2>&1
 )
 
 echo - FIM DO SCRIPT

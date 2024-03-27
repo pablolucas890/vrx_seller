@@ -1,5 +1,5 @@
 // TODO: Relacionar a textura setada com o touch para o usuario poder navegar
-// TODO: Sempre que carregar, sincronizar o print inicial?
+// TODO: Testar tempos de timeout e Promise com computadores mais ruins
 import clsx from 'clsx';
 import React from 'react';
 import { IoMenu } from 'react-icons/io5';
@@ -42,25 +42,31 @@ export function Simulation() {
   const [envLoading, setEnvLoading] = React.useState(true);
   const [textureLoading, setTextureLoading] = React.useState(false);
   const [imageTimestamp, setImageTimestamp] = React.useState('');
+  const [sync, setSync] = React.useState(localStorage.getItem('sync') == 'true');
 
   React.useEffect(() => {
     const interval = setInterval(async () => {
-      await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/is_model_open`).then(
-        async res => {
-          const is_model_open = await res.json();
-          setEnvLoading(!is_model_open);
-        },
-      );
+      await check_is_open();
     }, 1500);
 
     return () => clearInterval(interval);
   }, []);
 
   React.useEffect(() => {
+    if (viewSelected?.id && !envLoading && sync) update_texture_to_seller();
+  }, [viewSelected?.id, envLoading]);
+
+  React.useEffect(() => {
+    localStorage.setItem('sync', sync.toString());
+  }, [sync]);
+
+  React.useEffect(() => {
     setEnviroment(localStorage.getItem('enviroment') || '');
+    setSync(localStorage.getItem('sync') == 'true');
   }, [localStorage]);
 
   React.useEffect(() => {
+    check_is_open();
     verifyToken();
     setTextures(STRUCUTRE.materials.textures);
   }, []);
@@ -69,12 +75,21 @@ export function Simulation() {
     enviroments.forEach(env => {
       if (env.id === enviroment) {
         setViews(env.views);
-        setViewSelected(env.views[0]);
-        setImageTimestamp(`../assets/img/prints/${enviroment}-${env.views[0]?.id}.png?${Date.now()}`);
+        const viewSelected = env.views.find(el => el.id === localStorage.getItem('view')) || env.views[0];
+        setViewSelected(viewSelected);
+        setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected.id}.png?${Date.now()}`);
       }
     });
   }, [enviroment, enviroments]);
 
+  async function check_is_open() {
+    await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/is_model_open`).then(
+      async res => {
+        const is_model_open = await res.json();
+        setEnvLoading(!is_model_open);
+      },
+    );
+  }
   const fetchImageTimestamp = async (imageSrc: string) => {
     try {
       const response = await fetch(imageSrc, { method: 'HEAD' });
@@ -85,18 +100,18 @@ export function Simulation() {
     }
   };
 
-  const waitForImageUpdate = async (imageSrc: string, oldTimestamp: string, timeout = 30000, interval = 1000) => {
+  const waitForImageUpdate = async (imageSrc: string, oldTimestamp: string, timeout = 8000, interval = 1000) => {
     const startTime = Date.now();
 
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>(resolve => {
       const checkUpdate = async () => {
         const newTimestamp = await fetchImageTimestamp(imageSrc);
         console.log(newTimestamp, oldTimestamp);
         if (newTimestamp !== oldTimestamp) {
           resolve();
         } else if (Date.now() - startTime > timeout) {
-          reject(new Error('Timeout na espera pela atualização da imagem'));
-          // TODO: Na primeira vez as vezes nao aplica, talvez recarregar a pagina?
+          localStorage.setItem('view', viewSelected.id);
+          window.location.href = '/simulation';
         } else {
           setTimeout(checkUpdate, interval);
         }
@@ -106,29 +121,35 @@ export function Simulation() {
     });
   };
 
+  async function update_texture_to_seller() {
+    setTextureLoading(true);
+    const imageSrc = imageTimestamp;
+    const oldTimeStamp = await fetchImageTimestamp(imageSrc);
+    await fetch(
+      `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
+    );
+    await waitForImageUpdate(imageSrc, oldTimeStamp);
+    await new Promise(r => setTimeout(r, 2500));
+    setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
+    setTextureLoading(false);
+  }
+
   async function handleHome() {
     localStorage.removeItem('enviroment');
     window.location.href = '/home';
   }
 
-  async function handleUpdateGlass(type: 'client' | 'client_and_seller') {
+  async function handleUpdateGlass(type: 'client' | 'seller') {
     if (type === 'client') {
       if (!textureSelected || !touchSelected) return;
       setTextureLoading(true);
       await fetch(
         `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/texture?texture=${textureSelected.id}&touch=${touchSelected.id}`,
       );
-      await new Promise(r => setTimeout(r, 200));
-    } else if (type === 'client_and_seller') {
-      setTextureLoading(true);
-      const imageSrc = imageTimestamp;
-      const oldTimeStamp = await fetchImageTimestamp(imageSrc);
-      await fetch(
-        `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
-      );
-      await waitForImageUpdate(imageSrc, oldTimeStamp);
-      await new Promise(r => setTimeout(r, 3500));
-      setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
+    }
+    if ((type === 'seller' && !sync) || (type === 'client' && sync)) {
+      if (type === 'client' && sync) await new Promise(r => setTimeout(r, 700));
+      await update_texture_to_seller();
     }
     setTextureLoading(false);
   }
@@ -179,7 +200,6 @@ export function Simulation() {
           <SubTitle
             title='Mudar posição da área atual ▼'
             className='font-bold cursor-pointer'
-            // TODO: Ao mudar a view, sincronizar o print?
             onClick={() => setSelectViewOpen(!selectViewOpen)}
           />
           {selectViewOpen &&
@@ -193,6 +213,7 @@ export function Simulation() {
                 )}
                 onClick={() => {
                   setViewSelected(view);
+                  localStorage.setItem('view', view.id);
                   setImageTimestamp(`../assets/img/prints/${enviroment}-${view?.id}.png?${Date.now()}`);
                 }}
               />
@@ -237,15 +258,29 @@ export function Simulation() {
             </div>
             <Button
               title='Aplicar'
-              className='w-full mb-4'
+              className='w-full mt-2 mb-2'
               active={textureSelected != undefined}
               onClick={() => handleUpdateGlass('client')}
             />
-            <SubTitle
-              title='Aplicar no Editor'
-              className='font-bold cursor-pointer'
-              onClick={() => handleUpdateGlass('client_and_seller')}
+            <Button
+              title='Sincronizar'
+              className='w-full mb-2'
+              active={!sync}
+              onClick={() => handleUpdateGlass('seller')}
             />
+            <div>
+              <input
+                onChange={() => setSync(!sync)}
+                type='checkbox'
+                id='sync'
+                name='sync'
+                checked={sync}
+                className='mt-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
+              />
+              <label htmlFor='sync' className='font-poopins text-sm ml-2'>
+                Sincronizar todas as mudancas
+              </label>
+            </div>
           </div>
         )}
       </div>

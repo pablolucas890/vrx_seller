@@ -16,6 +16,16 @@ set :allow_credentials, true
 username = ENV['USERNAME']
 is_model_open = false
 
+latest_year = 0
+(2000..Time.now.year).each do |year|
+  path = "C:\\Program Files\\SketchUp\\SketchUp #{year}\\SketchUp.exe"
+  if File.exist?(path)
+    latest_year = year
+  end
+end
+
+return 'SketchUp não encontrado' if latest_year.zero?
+
 get '/' do
   "VRX"
 end
@@ -26,7 +36,7 @@ get '/texture' do
     puts texture
     puts entity_attr
 
-    File.open("C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp 2021\\SketchUp\\Plugins\\command.txt", 'w') do |file|
+    File.open("C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Plugins\\command.txt", 'w') do |file|
       file.puts "Sketchup::VRX::CustomizeModel.apply_texture('#{texture}.png', '#{entity_attr}')"
     end
 end
@@ -34,15 +44,15 @@ end
 get '/update' do
   project = params['project']
   view = params['view']
-  File.open("C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp 2021\\SketchUp\\Plugins\\command.txt", 'w') do |file|
+  File.open("C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Plugins\\command.txt", 'w') do |file|
     file.puts "Sketchup::VRX::Screenshot.screenshot_sketchup('#{project}', '#{view}')"
   end
 end
 
 get '/open_sketchup' do
   project = params['project']
-  sketchup_path = "C:\\Program Files\\SketchUp\\SketchUp 2021\\SketchUp.exe"
-  skp_file_path = "C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp 2021\\SketchUp\\Plugins\\enviroments\\#{project}.skp\""
+  sketchup_path = "C:\\Program Files\\SketchUp\\SketchUp #{latest_year}\\SketchUp.exe"
+  skp_file_path = "C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Plugins\\enviroments\\#{project}.skp\""
   system("start \"\" \"#{sketchup_path}\" \"#{skp_file_path}\"")
 end
 

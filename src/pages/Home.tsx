@@ -85,7 +85,6 @@ export function Home() {
 
   return (
     <Loading isLoading={loading}>
-      {/* TODO: Fazer botao de Upload textura se necessário*/}
       <Button title='Sair' onClick={handleLogout} active className='absolute top-5 left-10 shadow-xl' />
       <div className='flex flex-col items-center justify-center h-screen gap-4'>
         <Title title='Escolha o espaço' />

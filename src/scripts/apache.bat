@@ -37,8 +37,14 @@ IF %ERRORLEVEL% NEQ 0 (
     exit 1
 )
 
-echo - Copiando os arquivos da build para o diretorio do Apache
-xcopy /s /y "%OLD_DIR%\build\" "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\" >NUL 2>&1
+
+dir "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\assets" >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+    echo - Copiando os arquivos da build para o diretorio do Apache
+    xcopy /s /y "%OLD_DIR%\build\" "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\" >NUL 2>&1
+) ELSE (
+    echo - Arquivos ja estao no diretorio do Apache
+)
 
 findstr /c:"# VRX Configs" %HTTPD_CONF_FILE% > nul || (
     echo - Reescrevendo configuracoes do httpd
