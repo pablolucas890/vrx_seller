@@ -28,6 +28,7 @@ export function Home() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    localStorage.removeItem('touchTextures');
     verifyToken();
     verifySketchup();
   }, []);

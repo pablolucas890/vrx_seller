@@ -1,4 +1,3 @@
-// TODO: Ao desinstalar o electron, executar o clean.bat
 import { app, BrowserWindow, dialog } from 'electron';
 import path from 'path';
 import { dirname } from 'path';
@@ -47,7 +46,6 @@ app
           resolve();
         });
       });
-      // TODO: Usar html para mostrar o progresso e colocar botao de limpar instalacao
       showInfoMessage('Iniciando o VRX, na primeira execucao o processo pode levar alguns minutos!');
       await new Promise((resolve, reject) => {
         console.log('Intalando Chocolatey e Apache...');
@@ -65,8 +63,6 @@ app
           resolve();
         });
       });
-      // TODO: Fazer Download do projeto do plugin no github e enviar para a pasta Plugins
-      // TODO: Fazer Download dos enviroments e enviar para a pasta do sketchup
       console.log('Iniciando Ruby API...');
       exec('.\\src\\scripts\\api.bat', (error, stdout) => {
         if (error) console.log(error);

@@ -1,6 +1,5 @@
 import { IStructure } from './props';
 
-// TODO: Mudar as configurações para as do servidor na aws
 export const API_SERVER_PORT = 8080;
 export const API_SERVER_HOST = '192.168.68.131';
 export const API_SERVER_PROTOCOL = 'http';

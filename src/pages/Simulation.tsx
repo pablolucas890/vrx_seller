@@ -1,5 +1,3 @@
-// TODO: Relacionar a textura setada com o touch para o usuario poder navegar
-// TODO: Testar tempos de timeout e Promise com computadores mais ruins
 import clsx from 'clsx';
 import React from 'react';
 import { IoMenu } from 'react-icons/io5';
@@ -30,6 +28,11 @@ interface IVerifyResponse {
   };
 }
 
+interface ITouchTexture {
+  touchID: string;
+  textureID: string;
+}
+
 export function Simulation() {
   const [enviroment, setEnviroment] = React.useState(localStorage.getItem('enviroment') || '');
   const [views, setViews] = React.useState<IView[]>([]);
@@ -42,13 +45,21 @@ export function Simulation() {
   const [envLoading, setEnvLoading] = React.useState(true);
   const [textureLoading, setTextureLoading] = React.useState(false);
   const [imageTimestamp, setImageTimestamp] = React.useState('');
-  const [sync, setSync] = React.useState(localStorage.getItem('sync') == 'true');
+  const [touchTextures, setTouchTextures] = React.useState<ITouchTexture[]>(
+    localStorage.getItem('touchTextures') ? JSON.parse(localStorage.getItem('touchTextures') || '[]') : [],
+  );
+  const [sync, setSync] = React.useState(
+    localStorage.getItem('sync') ? localStorage.getItem('sync') === 'true' : true,
+  );
 
   React.useEffect(() => {
-    const interval = setInterval(async () => {
-      await check_is_open();
-    }, 1500);
+    check_is_open();
+    verifyToken();
+    setTextures(STRUCUTRE.materials.textures);
+  }, []);
 
+  React.useEffect(() => {
+    const interval = setInterval(async () => await check_is_open(), 1500);
     return () => clearInterval(interval);
   }, []);
 
@@ -66,12 +77,6 @@ export function Simulation() {
   }, [localStorage]);
 
   React.useEffect(() => {
-    check_is_open();
-    verifyToken();
-    setTextures(STRUCUTRE.materials.textures);
-  }, []);
-
-  React.useEffect(() => {
     enviroments.forEach(env => {
       if (env.id === enviroment) {
         setViews(env.views);
@@ -82,14 +87,6 @@ export function Simulation() {
     });
   }, [enviroment, enviroments]);
 
-  async function check_is_open() {
-    await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/is_model_open`).then(
-      async res => {
-        const is_model_open = await res.json();
-        setEnvLoading(!is_model_open);
-      },
-    );
-  }
   const fetchImageTimestamp = async (imageSrc: string) => {
     try {
       const response = await fetch(imageSrc, { method: 'HEAD' });
@@ -100,58 +97,9 @@ export function Simulation() {
     }
   };
 
-  const waitForImageUpdate = async (imageSrc: string, oldTimestamp: string, timeout = 8000, interval = 1000) => {
-    const startTime = Date.now();
-
-    return new Promise<void>(resolve => {
-      const checkUpdate = async () => {
-        const newTimestamp = await fetchImageTimestamp(imageSrc);
-        console.log(newTimestamp, oldTimestamp);
-        if (newTimestamp !== oldTimestamp) {
-          resolve();
-        } else if (Date.now() - startTime > timeout) {
-          localStorage.setItem('view', viewSelected.id);
-          window.location.href = '/simulation';
-        } else {
-          setTimeout(checkUpdate, interval);
-        }
-      };
-
-      checkUpdate();
-    });
-  };
-
-  async function update_texture_to_seller() {
-    setTextureLoading(true);
-    const imageSrc = imageTimestamp;
-    const oldTimeStamp = await fetchImageTimestamp(imageSrc);
-    await fetch(
-      `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
-    );
-    await waitForImageUpdate(imageSrc, oldTimeStamp);
-    await new Promise(r => setTimeout(r, 2500));
-    setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
-    setTextureLoading(false);
-  }
-
-  async function handleHome() {
+  function handleHome() {
     localStorage.removeItem('enviroment');
     window.location.href = '/home';
-  }
-
-  async function handleUpdateGlass(type: 'client' | 'seller') {
-    if (type === 'client') {
-      if (!textureSelected || !touchSelected) return;
-      setTextureLoading(true);
-      await fetch(
-        `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/texture?texture=${textureSelected.id}&touch=${touchSelected.id}`,
-      );
-    }
-    if ((type === 'seller' && !sync) || (type === 'client' && sync)) {
-      if (type === 'client' && sync) await new Promise(r => setTimeout(r, 700));
-      await update_texture_to_seller();
-    }
-    setTextureLoading(false);
   }
 
   function handleCancelSelect() {
@@ -159,7 +107,7 @@ export function Simulation() {
     setTouchSelected(undefined);
   }
 
-  async function handleFilterTextures(filter: string) {
+  function handleFilterTextures(filter: string) {
     if (filter === '') setTextures(STRUCUTRE.materials.textures);
     else {
       const filtered = STRUCUTRE.materials.textures.filter(texture =>
@@ -167,6 +115,46 @@ export function Simulation() {
       );
       setTextures(filtered);
     }
+  }
+
+  async function handleTexture(texture: ITexture) {
+    if (!texture || !touchSelected) return;
+    setTextureLoading(true);
+    const exists = touchTextures.find(el => el.touchID === touchSelected.id);
+    let newTouchTextures;
+    if (exists) {
+      newTouchTextures = touchTextures.map(el => {
+        if (el.touchID === touchSelected.id) return { touchID: el.touchID, textureID: texture.id };
+        return el;
+      });
+    } else newTouchTextures = [...touchTextures, { touchID: touchSelected.id, textureID: texture.id }];
+    setTouchTextures(newTouchTextures);
+    localStorage.setItem('touchTextures', JSON.stringify(newTouchTextures));
+    setTextureSelected(texture);
+    await fetch(
+      `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/texture?texture=${texture.id}&touch=${touchSelected.id}`,
+    );
+    if (sync) {
+      await new Promise(r => setTimeout(r, 1000));
+      await update_texture_to_seller();
+    }
+    setTextureLoading(false);
+  }
+
+  async function handleTouch(touch: ITouch) {
+    setTouchSelected(touch);
+    const touchTexture = touchTextures.find(el => el.touchID === touch.id);
+    if (touchTexture) {
+      const texture = STRUCUTRE.materials.textures.find(el => el.id === touchTexture.textureID);
+      setTextureSelected(texture);
+    } else setTextureSelected(undefined);
+  }
+
+  async function handleView(view: IView) {
+    setViewSelected(view);
+    localStorage.setItem('view', view.id);
+    setTouchSelected(undefined);
+    setImageTimestamp(`../assets/img/prints/${enviroment}-${view?.id}.png?${Date.now()}`);
   }
 
   async function verifyToken() {
@@ -188,6 +176,50 @@ export function Simulation() {
         window.location.href = '/';
       });
   }
+
+  async function update_texture_to_seller() {
+    setTextureLoading(true);
+    const imageSrc = imageTimestamp;
+    const oldTimeStamp = await fetchImageTimestamp(imageSrc);
+    await fetch(
+      `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
+    );
+    await waitForImageUpdate(imageSrc, oldTimeStamp);
+    await new Promise(r => setTimeout(r, 3500));
+    setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
+    setTextureLoading(false);
+  }
+
+  async function waitForImageUpdate(imageSrc: string, oldTimestamp: string, timeout = 10000, interval = 1000) {
+    const startTime = Date.now();
+
+    return new Promise<void>(resolve => {
+      const checkUpdate = async () => {
+        const newTimestamp = await fetchImageTimestamp(imageSrc);
+        console.log(newTimestamp, oldTimestamp);
+        if (newTimestamp !== oldTimestamp) {
+          resolve();
+        } else if (Date.now() - startTime > timeout) {
+          localStorage.setItem('view', viewSelected.id);
+          window.location.href = '/simulation';
+        } else {
+          setTimeout(checkUpdate, interval);
+        }
+      };
+
+      checkUpdate();
+    });
+  }
+
+  async function check_is_open() {
+    await fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/is_model_open`).then(
+      async res => {
+        const is_model_open = await res.json();
+        setEnvLoading(!is_model_open);
+      },
+    );
+  }
+
   return (
     <Loading isLoading={envLoading || textureLoading}>
       <div className='flex'>
@@ -211,22 +243,44 @@ export function Simulation() {
                   'ml-4 font-bold cursor-pointer mt-4',
                   viewSelected?.id === view.id && 'text-primary-500',
                 )}
-                onClick={() => {
-                  setViewSelected(view);
-                  localStorage.setItem('view', view.id);
-                  setImageTimestamp(`../assets/img/prints/${enviroment}-${view?.id}.png?${Date.now()}`);
-                }}
+                onClick={() => handleView(view)}
               />
             ))}
         </dialog>
         {viewSelected?.touchs.map((touch, index) => (
-          <Image
-            key={index}
-            url={`../assets/img/touch${touchSelected?.id === touch.id ? '_selected' : ''}.png`}
-            className='absolute cursor-pointer z-20'
-            style={{ left: `${touch.x}`, top: `${touch.y}` }}
-            onClick={() => setTouchSelected(touch)}
-          />
+          <>
+            <Image
+              key={index}
+              url={`../assets/img/touch${touchSelected?.id === touch.id ? '_selected' : ''}.png`}
+              className='absolute cursor-pointer z-20'
+              style={{ left: `${touch.x}`, top: `${touch.y}` }}
+              onClick={() => handleTouch(touch)}
+            />
+            {touchTextures.find(el => el.touchID === touch.id)?.textureID && (
+              <>
+                <img
+                  key={index}
+                  src={`../assets/img/materials/${touchTextures.find(el => el.touchID === touch.id)?.textureID}.png`}
+                  className='absolute z-20 w-10 h-10 border-2 border-black shadow-xl'
+                  style={{ left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`, top: `${touch.y}` }}
+                />
+                <SubTitle
+                  key={index}
+                  title={
+                    STRUCUTRE.materials.textures.find(
+                      el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID,
+                    )?.name || ''
+                  }
+                  className='absolute z-20 font-bold'
+                  style={{
+                    left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`,
+                    top: `${parseInt(touch.y.substring(0, touch.y.length - 1)) + 5}%`,
+                    textShadow: '2px 2px 4px white',
+                  }}
+                />
+              </>
+            )}
+          </>
         ))}
         {enviroment && (
           <div className='flex'>
@@ -250,23 +304,23 @@ export function Simulation() {
                       'rounded-md h-10 w-full border-2 ',
                       textureSelected?.id === texture.id && 'border-primary-500',
                     )}
-                    onClick={() => setTextureSelected(texture)}
+                    onClick={() => handleTexture(texture)}
                   />
                   <SubTitle title={texture.name} className='text-center text-secondary-600' />
                 </div>
               ))}
             </div>
             <Button
-              title='Aplicar'
-              className='w-full mt-2 mb-2'
-              active={textureSelected != undefined}
-              onClick={() => handleUpdateGlass('client')}
-            />
-            <Button
               title='Sincronizar'
               className='w-full mb-2'
               active={!sync}
-              onClick={() => handleUpdateGlass('seller')}
+              onClick={async () => {
+                if (!sync) {
+                  setTextureLoading(true);
+                  await update_texture_to_seller();
+                  setTextureLoading(false);
+                }
+              }}
             />
             <div>
               <input
