@@ -17,7 +17,7 @@ import {
   STRUCUTRE,
 } from '../global/utils';
 
-const enviroments = STRUCUTRE.enviroments;
+const environments = STRUCUTRE.environments;
 
 interface IVerifyResponse {
   message: string;
@@ -77,7 +77,7 @@ export function Simulation() {
   }, [localStorage]);
 
   React.useEffect(() => {
-    enviroments.forEach(env => {
+    environments.forEach(env => {
       if (env.id === enviroment) {
         setViews(env.views);
         const viewSelected = env.views.find(el => el.id === localStorage.getItem('view')) || env.views[0];
@@ -85,7 +85,7 @@ export function Simulation() {
         setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected.id}.png?${Date.now()}`);
       }
     });
-  }, [enviroment, enviroments]);
+  }, [enviroment, environments]);
 
   const fetchImageTimestamp = async (imageSrc: string) => {
     try {

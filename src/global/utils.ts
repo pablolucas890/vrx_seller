@@ -19,7 +19,7 @@ export const STRUCUTRE: IStructure = {
       { id: 'ARANHA', name: 'Aranha' },
     ],
   },
-  enviroments: [
+  environments: [
     {
       id: 'env1',
       name: 'Área de Lazer',

@@ -28,5 +28,5 @@ export interface ITouch {
 
 export interface IStructure {
   materials: IMaterial;
-  enviroments: IEviroment[];
+  environments: IEviroment[];
 }

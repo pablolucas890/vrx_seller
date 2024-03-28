@@ -43,13 +43,13 @@ IF %ERRORLEVEL% NEQ 0 (
     xcopy "%last_folder%\SketchUp\Plugins\vrx_plugin-main\*" "%last_folder%\SketchUp\Plugins" /E /I /Y >NUL 2>&1
     del %ZIP_FILE%
     rmdir "%last_folder%\SketchUp\Plugins\vrx_plugin-main" /s /q
-    wget --no-check-certificate "%ENV_URL%/env1.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env1.skp"
-    wget --no-check-certificate "%ENV_URL%/env2.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env2.skp"
-    wget --no-check-certificate "%ENV_URL%/env3.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env3.skp"
-    wget --no-check-certificate "%ENV_URL%/env4.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env4.skp"
-    wget --no-check-certificate "%ENV_URL%/env5.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env5.skp"
-    wget --no-check-certificate "%ENV_URL%/env6.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env6.skp"
-    wget --no-check-certificate "%ENV_URL%/env7.skp" -O "%last_folder%\SketchUp\Plugins\enviroments\env7.skp"
+    wget --no-check-certificate "%ENV_URL%/env1.skp" -O "%last_folder%\SketchUp\Plugins\environments\env1.skp"
+    wget --no-check-certificate "%ENV_URL%/env2.skp" -O "%last_folder%\SketchUp\Plugins\environments\env2.skp"
+    wget --no-check-certificate "%ENV_URL%/env3.skp" -O "%last_folder%\SketchUp\Plugins\environments\env3.skp"
+    wget --no-check-certificate "%ENV_URL%/env4.skp" -O "%last_folder%\SketchUp\Plugins\environments\env4.skp"
+    wget --no-check-certificate "%ENV_URL%/env5.skp" -O "%last_folder%\SketchUp\Plugins\environments\env5.skp"
+    wget --no-check-certificate "%ENV_URL%/env6.skp" -O "%last_folder%\SketchUp\Plugins\environments\env6.skp"
+    wget --no-check-certificate "%ENV_URL%/env7.skp" -O "%last_folder%\SketchUp\Plugins\environments\env7.skp"
     echo - Plugin VRX foi instalado com sucesso
 ) ELSE (
     echo - Plugin VRX ja esta instalado

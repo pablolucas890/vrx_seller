@@ -24,7 +24,7 @@ interface IVerifyResponse {
   };
 }
 export function Home() {
-  const enviroments = STRUCUTRE.enviroments;
+  const environments = STRUCUTRE.environments;
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -91,14 +91,14 @@ export function Home() {
         <Title title='Escolha o espaço' />
         <SubTitle title='Toque em um dos ambientes abaixo e comece a simular' />
         <div className='grid grid-cols-3 gap-4 p-4 rounded-md'>
-          {enviroments.map((env, index) => (
+          {environments.map((env, index) => (
             <Image
               key={env.id}
               url={`../assets/img/home_buttons/${env.id}.png`}
               onClick={() => handleEnv(env.id)}
               className={clsx(
                 'z-20 cursor-pointer',
-                index === enviroments.length - 1 && enviroments.length % 3 != 0 && 'col-start-2',
+                index === environments.length - 1 && environments.length % 3 != 0 && 'col-start-2',
               )}
             />
           ))}
