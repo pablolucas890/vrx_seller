@@ -1,15 +1,8 @@
 @echo off
+call "%~dp0\utils.bat"
 
-set "SCRIPT_DIR=%~dp0"
-cd /d "%SCRIPT_DIR%"
-cd ..
-cd ..
-set OLD_DIR=%CD%
-set APACHE_BIN_FILE=%USERPROFILE%\AppData\Roaming\Apache24\bin\httpd.exe
-set APACHE_CONF_FOLDER=%USERPROFILE%\AppData\Roaming\Apache24\conf
-set HTTPD_CONF_FILE=%APACHE_CONF_FOLDER%\httpd.conf
-
-where choco >nul 2>&1
+:chocolatey
+where choco >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Chocolatey
     cmd /c @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
@@ -22,6 +15,7 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Chocolatey ja esta instalado
 )
 
+:apache
 dir %APACHE_CONF_FOLDER% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Apache HTTPD
@@ -37,7 +31,7 @@ IF %ERRORLEVEL% NEQ 0 (
     exit 1
 )
 
-
+:copyhtdocs
 dir "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\assets" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Copiando os arquivos da build para o diretorio do Apache
@@ -46,7 +40,8 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Arquivos ja estao no diretorio do Apache
 )
 
-findstr /c:"# VRX Configs" %HTTPD_CONF_FILE% > nul || (
+:rewriteconf
+findstr /c:"# VRX Configs" %HTTPD_CONF_FILE% > NUL || (
     echo - Reescrevendo configuracoes do httpd
     echo # VRX Configs >> %HTTPD_CONF_FILE%
     echo LoadModule rewrite_module modules/mod_rewrite.so >> "%HTTPD_CONF_FILE%"
@@ -56,6 +51,8 @@ findstr /c:"# VRX Configs" %HTTPD_CONF_FILE% > nul || (
     echo Require all granted >> "%HTTPD_CONF_FILE%"
     echo ^</Directory^> >> "%HTTPD_CONF_FILE%"
 )
+
+:restartapache
 echo - Restartando Apache
 echo -     Matando Processos na porta 80
 for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":]:80"') do (

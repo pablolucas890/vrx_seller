@@ -1,23 +1,20 @@
 @echo off
+call "%~dp0\utils.bat"
 
-set "SCRIPT_DIR=%~dp0"
-cd /d "%SCRIPT_DIR%"
-cd ..
-cd ..
-set OLD_DIR=%CD%
-set PORTA=4567
-
-:kill
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%PORTA%"') do (
+:killport
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%API_PORT%"') do (
     set PID=%%a
-    goto :found
+    goto :portfound
 )
-:notfound
-echo Processo na porta %PORTA% não encontrado.
-goto :start
-:found
-echo Encerrando o processo %PID% na porta %PORTA%.
+
+:portnoutfound
+echo - Processo na porta %API_PORT% não encontrado.
+goto :startapi
+
+:portfound
+echo - Encerrando o processo %PID% na porta %API_PORT%.
 taskkill /F /PID %PID%
 
-:start
+:startapi
 start /B ruby "%OLD_DIR%\src\api.rb"
+:end

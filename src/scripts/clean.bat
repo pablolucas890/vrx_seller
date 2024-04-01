@@ -1,7 +1,5 @@
 @echo off
-
-set APACHE_BIN_FILE=%USERPROFILE%\AppData\Roaming\Apache24\bin\httpd.exe
-set PORTA=4567
+call "%~dp0\utils.bat"
 
 :apache
 %APACHE_BIN_FILE% -k stop
@@ -9,16 +7,18 @@ set PORTA=4567
 choco uninstall -y apache-httpd
 
 
-:ruby
-for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%PORTA%"') do (
+:rubyapi
+for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%API_PORT%"') do (
     set PID=%%a
-    goto :found
+    goto :portfound
 )
-:notfound
-echo Processo na porta %PORTA% não encontrado.
+
+:portnotfound
+echo - Processo na porta %API_PORT% não encontrado.
 goto :end
-:found
-echo Encerrando o processo %PID% na porta %PORTA%.
+
+:portfound
+echo - Encerrando o processo %PID% na porta %API_PORT%.
 taskkill /F /PID %PID%
 choco uninstall -y ruby
 

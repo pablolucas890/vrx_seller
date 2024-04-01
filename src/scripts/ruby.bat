@@ -1,17 +1,8 @@
 @echo off
+call "%~dp0\utils.bat"
 
-set "SCRIPT_DIR=%~dp0"
-cd /d "%SCRIPT_DIR%"
-cd ..
-cd ..
-set OLD_DIR=%CD%
-set "SKETCHUP_BASE_FOLDER=%USERPROFILE%\AppData\Roaming\SketchUp\SketchUp "
-set REPO_URL=https://github.com/Jadyla/vrx_plugin/archive/refs/heads/main.zip
-set ZIP_FILE="%USERPROFILE%\Downloads\vrx_plugin.zip"
-set ENV_URL="http://192.168.68.131:8080/environments"
-
-echo - Verificando se o Ruby esta instalado
-where ruby >nul 2>&1
+:installruby
+where ruby >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Ruby
     choco install -y ruby --version 2.7.2
@@ -24,35 +15,34 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Ruby ja esta instalado
 )
 
+:copymaterials
 echo - Copiando os arquivos de materiais
 for /D %%D in ("%SKETCHUP_BASE_FOLDER%*") do (
-    set last_folder=%%D
+    set LAST_SKETCHUP=%%D
 )
-xcopy "%OLD_DIR%\build\assets\img\materials\*" "%last_folder%\SketchUp\Materials" /E /I /Y >NUL 2>&1
+xcopy "%OLD_DIR%\build\assets\img\materials\*" "%LAST_SKETCHUP%\SketchUp\Materials" /E /I /Y >NUL 2>&1
 
-echo - Fazendo Download do Plugin VRX
-dir "%last_folder%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
+:plugin
+dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-    echo "%last_folder%\SketchUp\Plugins"
-    echo -   Baixando wget
+    echo "%LAST_SKETCHUP%\SketchUp\Plugins"
+    echo - Baixando wget
     choco install wget -y
-    echo -   Baixando Plugin
+    echo - Baixando Plugin VRX
     wget %REPO_URL% -O %ZIP_FILE%
     echo -   Extraindo arquivo zip...
-    tar -xf %ZIP_FILE% -C "%last_folder%\SketchUp\Plugins"
-    xcopy "%last_folder%\SketchUp\Plugins\vrx_plugin-main\*" "%last_folder%\SketchUp\Plugins" /E /I /Y >NUL 2>&1
+    tar -xf %ZIP_FILE% -C "%LAST_SKETCHUP%\SketchUp\Plugins"
+    xcopy "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main\*" "%LAST_SKETCHUP%\SketchUp\Plugins" /E /I /Y >NUL 2>&1
     del %ZIP_FILE%
-    rmdir "%last_folder%\SketchUp\Plugins\vrx_plugin-main" /s /q
-    wget --no-check-certificate "%ENV_URL%/env1.skp" -O "%last_folder%\SketchUp\Plugins\environments\env1.skp"
-    wget --no-check-certificate "%ENV_URL%/env2.skp" -O "%last_folder%\SketchUp\Plugins\environments\env2.skp"
-    wget --no-check-certificate "%ENV_URL%/env3.skp" -O "%last_folder%\SketchUp\Plugins\environments\env3.skp"
-    wget --no-check-certificate "%ENV_URL%/env4.skp" -O "%last_folder%\SketchUp\Plugins\environments\env4.skp"
-    wget --no-check-certificate "%ENV_URL%/env5.skp" -O "%last_folder%\SketchUp\Plugins\environments\env5.skp"
-    wget --no-check-certificate "%ENV_URL%/env6.skp" -O "%last_folder%\SketchUp\Plugins\environments\env6.skp"
-    wget --no-check-certificate "%ENV_URL%/env7.skp" -O "%last_folder%\SketchUp\Plugins\environments\env7.skp"
+    rmdir "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main" /s /q
+    echo -   Baixando arquivos de ambiente
+    for %%i in (1 2 3 4 5 6 7) do (
+        wget --no-check-certificate "%ENV_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp"
+    )
     echo - Plugin VRX foi instalado com sucesso
 ) ELSE (
     echo - Plugin VRX ja esta instalado
 )
+
 echo - FIM DO SCRIPT
 :end
