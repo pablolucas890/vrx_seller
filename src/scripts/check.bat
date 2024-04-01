@@ -49,4 +49,18 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Enviroments nao encontrados
 )
 
+goto :listgems
+
+:installGem
+gem list | findstr %1 >NUL
+IF %ERRORLEVEL% NEQ 0 (
+    echo - Gem %1 nao encontrada
+)
+goto :end
+
+:listgems
+FOR %%G IN (sinatra httparty sinatra-cors websocket-client-simple json http uri) DO (
+    CALL :installGem %%G
+)
+
 :end

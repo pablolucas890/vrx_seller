@@ -44,5 +44,23 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Plugin VRX ja esta instalado
 )
 
+goto :listgems
+
+:installGem
+gem list | findstr %1 >NUL
+IF %ERRORLEVEL% NEQ 0 (
+    echo -   Instalando a gem %1
+    gem install %1
+) ELSE (
+    echo -   Gem %1 ja esta instalada
+)
+goto :end
+
+:listgems
+echo - Instalando as gems
+FOR %%G IN (sinatra httparty sinatra-cors websocket-client-simple json http uri) DO (
+    CALL :installGem %%G
+)
+
 echo - FIM DO SCRIPT
 :end
