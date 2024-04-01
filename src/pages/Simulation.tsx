@@ -14,19 +14,10 @@ import {
   SKETCHUP_SERVER_HOST,
   SKETCHUP_SERVER_PORT,
   SKETCHUP_SERVER_PROTOCOL,
-  STRUCUTRE,
+  STRUCTURE,
 } from '../global/utils';
 
-const environments = STRUCUTRE.environments;
-
-interface IVerifyResponse {
-  message: string;
-  decoded?: {
-    email: string;
-    iat: number;
-    exp: number;
-  };
-}
+const environments = STRUCTURE.environments;
 
 interface ITouchTexture {
   touchID: string;
@@ -41,21 +32,19 @@ export function Simulation() {
   const [selectViewOpen, setSelectViewOpen] = React.useState(false);
   const [touchSelected, setTouchSelected] = React.useState<ITouch>();
   const [textureSelected, setTextureSelected] = React.useState<ITexture>();
-  const [textures, setTextures] = React.useState<ITexture[]>([]);
+  const [textures, setTextures] = React.useState<ITexture[]>(STRUCTURE.materials.textures);
+  const [localTextures, setLocalTextures] = React.useState<ITexture[]>([]);
   const [envLoading, setEnvLoading] = React.useState(true);
   const [textureLoading, setTextureLoading] = React.useState(false);
   const [imageTimestamp, setImageTimestamp] = React.useState('');
   const [touchTextures, setTouchTextures] = React.useState<ITouchTexture[]>(
     localStorage.getItem('touchTextures') ? JSON.parse(localStorage.getItem('touchTextures') || '[]') : [],
   );
-  const [sync, setSync] = React.useState(
-    localStorage.getItem('sync') ? localStorage.getItem('sync') === 'true' : true,
-  );
+  const [sync, setSync] = React.useState(localStorage.getItem('sync') ? localStorage.getItem('sync') === 'true' : true);
 
   React.useEffect(() => {
     check_is_open();
-    verifyToken();
-    setTextures(STRUCUTRE.materials.textures);
+    checkNewMaterials();
   }, []);
 
   React.useEffect(() => {
@@ -97,6 +86,37 @@ export function Simulation() {
     }
   };
 
+  async function checkNewMaterials() {
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/';
+
+    await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/materials`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    })
+      .then(async res => {
+        if (!res.ok) window.location.href = '/';
+        const { materials }: { materials: string[] } = await res.json();
+        const resMaterials = await fetch(
+          `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/materials`,
+        );
+        const localMaterials = await resMaterials.json();
+        const newMaterials = materials.filter(el => !localMaterials.includes(el));
+        newMaterials.forEach(async (material: string) => {
+          await fetch(
+            `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/material?material=${material}`,
+          );
+        });
+        setLocalTextures(materials.map((m: string) => ({ id: m.replace('.png', ''), name: m.replace('.png', '') })));
+        setTextures(materials.map((m: string) => ({ id: m.replace('.png', ''), name: m.replace('.png', '') })));
+      })
+      .catch(() => {
+        localStorage.removeItem('token');
+        window.location.href = '/';
+      });
+  }
+
   function handleHome() {
     localStorage.removeItem('enviroment');
     window.location.href = '/home';
@@ -108,11 +128,9 @@ export function Simulation() {
   }
 
   function handleFilterTextures(filter: string) {
-    if (filter === '') setTextures(STRUCUTRE.materials.textures);
+    if (filter === '') setTextures(localTextures);
     else {
-      const filtered = STRUCUTRE.materials.textures.filter(texture =>
-        texture.name.toLowerCase().includes(filter.toLowerCase()),
-      );
+      const filtered = localTextures.filter(texture => texture.name.toLowerCase().includes(filter.toLowerCase()));
       setTextures(filtered);
     }
   }
@@ -145,7 +163,7 @@ export function Simulation() {
     setTouchSelected(touch);
     const touchTexture = touchTextures.find(el => el.touchID === touch.id);
     if (touchTexture) {
-      const texture = STRUCUTRE.materials.textures.find(el => el.id === touchTexture.textureID);
+      const texture = localTextures.find(el => el.id === touchTexture.textureID);
       setTextureSelected(texture);
     } else setTextureSelected(undefined);
   }
@@ -155,26 +173,6 @@ export function Simulation() {
     localStorage.setItem('view', view.id);
     setTouchSelected(undefined);
     setImageTimestamp(`../assets/img/prints/${enviroment}-${view?.id}.png?${Date.now()}`);
-  }
-
-  async function verifyToken() {
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/';
-
-    await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/verify`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
-    })
-      .then(async res => {
-        if (!res.ok) window.location.href = '/';
-        const { decoded }: IVerifyResponse = await res.json();
-        console.log(decoded);
-      })
-      .catch(() => {
-        localStorage.removeItem('token');
-        window.location.href = '/';
-      });
   }
 
   async function update_texture_to_seller() {
@@ -267,9 +265,8 @@ export function Simulation() {
                 <SubTitle
                   key={index}
                   title={
-                    STRUCUTRE.materials.textures.find(
-                      el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID,
-                    )?.name || ''
+                    localTextures.find(el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID)
+                      ?.name || ''
                   }
                   className='absolute z-20 font-bold'
                   style={{

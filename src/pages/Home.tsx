@@ -12,7 +12,7 @@ import {
   SKETCHUP_SERVER_HOST,
   SKETCHUP_SERVER_PORT,
   SKETCHUP_SERVER_PROTOCOL,
-  STRUCUTRE,
+  STRUCTURE,
 } from '../global/utils';
 
 interface IVerifyResponse {
@@ -24,7 +24,7 @@ interface IVerifyResponse {
   };
 }
 export function Home() {
-  const environments = STRUCUTRE.environments;
+  const environments = STRUCTURE.environments;
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {

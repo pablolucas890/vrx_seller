@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/cors'
 require 'json'
 require 'faye/websocket'
+require 'httparty'
 
 set :server, 'puma'
 set :sockets, []
@@ -13,6 +14,7 @@ set :allow_headers, "content-type,if-modified-since"
 set :expose_headers, "location,link"
 set :allow_credentials, true
 
+DOWNLOAD_URL='http://192.168.68.131:8080/download/'
 username = ENV['USERNAME']
 is_model_open = false
 
@@ -75,5 +77,22 @@ get '/is_model_open' do
     body 'true'
   else
     body 'false'
+  end
+end
+
+get '/materials' do
+  materials = Dir.entries("C:\\Users\\#{username}\\AppData\\Roaming\\Apache24\\htdocs\\assets\\img\\materials").select { |f| !File.directory? f }
+  materials.to_json
+end
+
+get '/material' do
+  material = params['material']
+  api = DOWNLOAD_URL + material
+  response = HTTParty.get(api)
+  File.open("C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Materials\\#{material}", 'wb') do |file|
+    file.write(response.body)
+  end
+  File.open("C:\\Users\\#{username}\\AppData\\Roaming\\Apache24\\htdocs\\assets\\img\\materials\\#{material}", 'wb') do |file|
+    file.write(response.body)
   end
 end

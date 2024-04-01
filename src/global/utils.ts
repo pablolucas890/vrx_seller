@@ -7,7 +7,7 @@ export const SKETCHUP_SERVER_PORT = 4567;
 export const SKETCHUP_SERVER_HOST = 'localhost';
 export const SKETCHUP_SERVER_PROTOCOL = 'http';
 
-export const STRUCUTRE: IStructure = {
+export const STRUCTURE: IStructure = {
   materials: {
     materialsPath: 'assets/img/materials',
     textures: [

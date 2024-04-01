@@ -37,7 +37,7 @@ IF %ERRORLEVEL% NEQ 0 (
     rmdir "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main" /s /q
     echo -   Baixando arquivos de ambiente
     for %%i in (1 2 3 4 5 6 7) do (
-        wget --no-check-certificate "%ENV_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp"
+        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp"
     )
     echo - Plugin VRX foi instalado com sucesso
 ) ELSE (

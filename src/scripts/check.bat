@@ -20,7 +20,7 @@ IF "%PID%"=="" (
 )
 
 :copyhtdocs
-dir "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\assets" >NUL 2>&1
+dir "%HTDOCS_FOLDER%\assets" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Arquivos nao encontrados
 )
@@ -43,6 +43,10 @@ for /D %%D in ("%SKETCHUP_BASE_FOLDER%*") do (
 dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Plugin nao encontrado
+)
+dir "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env1.skp" >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+    echo - Enviroments nao encontrados
 )
 
 :end

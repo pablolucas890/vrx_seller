@@ -32,10 +32,10 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 :copyhtdocs
-dir "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\assets" >NUL 2>&1
+dir "%HTDOCS_FOLDER%\assets" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Copiando os arquivos da build para o diretorio do Apache
-    xcopy /s /y "%OLD_DIR%\build\" "%USERPROFILE%\AppData\Roaming\Apache24\htdocs\" >NUL 2>&1
+    xcopy /s /y "%OLD_DIR%\build\" "%HTDOCS_FOLDER%\" >NUL 2>&1
 ) ELSE (
     echo - Arquivos ja estao no diretorio do Apache
 )
