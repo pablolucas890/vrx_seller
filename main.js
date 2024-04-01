@@ -78,6 +78,16 @@ function createMainWindow() {
     },
   });
   mainWindow.loadURL('http://localhost/');
+  mainWindow.on('close', async () => {
+    console.log('Closing Sketchup');
+    try {
+      await fetch('http://localhost:4567/close_sketchup');
+    } catch (err) {
+      console.error('Error calling API on close:', err);
+    }
+    await new Promise(r => setTimeout(r, 1000));
+    app.quit();
+  });
 }
 
 app
