@@ -5,7 +5,7 @@ call "%~dp0\utils.bat"
 where ruby >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Ruby
-    choco install -y ruby --version 2.7.2
+    choco install -y ruby --force
     IF %ERRORLEVEL% NEQ 0 (
         echo - Falha ao instalar o Ruby. Por favor, instale manualmente e tente novamente.
         exit 1
@@ -27,7 +27,7 @@ dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo - Baixando wget
-    choco install wget -y
+    choco install wget -y --force
     echo - Baixando Plugin VRX
     wget %REPO_URL% -O %ZIP_FILE%
     echo -   Extraindo arquivo zip...

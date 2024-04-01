@@ -19,7 +19,7 @@ IF %ERRORLEVEL% NEQ 0 (
 dir %APACHE_CONF_FOLDER% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Apache HTTPD
-    choco install -y apache-httpd --params '/Port:80'
+    choco install -y apache-httpd --params '/Port:80' --force
     echo - Startando Apache HTTPD
     %APACHE_BIN_FILE% -k install
 ) ELSE (
