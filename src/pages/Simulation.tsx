@@ -7,6 +7,8 @@ import Input from '../components/Input';
 import Loading from '../components/Loading';
 import SubTitle from '../components/SubTitle';
 import { ITexture, ITouch, IView } from '../global/props';
+import { IoMdArrowBack } from 'react-icons/io';
+
 import {
   API_SERVER_HOST,
   API_SERVER_PORT,
@@ -219,123 +221,136 @@ export function Simulation() {
   }
 
   return (
-    <Loading isLoading={envLoading || textureLoading}>
-      <div className='flex'>
-        <IoMenu
-          className='absolute left-10 top-10 text-4xl text-white bg-primary-500 rounded-3xl p-1 z-20'
-          onClick={() => setDialogOpen(!dialogOpen)}
+    <>
+      {(envLoading || textureLoading) && (
+        <IoMdArrowBack
+          className='absolute left-10 top-10 text-4xl text-white bg-primary-500 rounded-3xl p-1 z-50'
+          onClick={handleHome}
         />
-        <dialog open={dialogOpen} className='absolute top-16 right-2/3 bg-white p-4 rounded-xl z-30'>
-          <SubTitle title='Escolher outra área' className='font-bold cursor-pointer mb-4' onClick={handleHome} />
-          <SubTitle
-            title='Mudar posição da área atual ▼'
-            className='font-bold cursor-pointer'
-            onClick={() => setSelectViewOpen(!selectViewOpen)}
+      )}
+      <Loading isLoading={envLoading || textureLoading}>
+        <div className='flex'>
+          <IoMenu
+            className='absolute left-10 top-10 text-4xl text-white bg-primary-500 rounded-3xl p-1 z-20'
+            onClick={() => setDialogOpen(!dialogOpen)}
           />
-          {selectViewOpen &&
-            views.map((view, index) => (
-              <SubTitle
-                key={index}
-                title={`► ${view.name}`}
-                className={clsx(
-                  'ml-4 font-bold cursor-pointer mt-4',
-                  viewSelected?.id === view.id && 'text-primary-500',
-                )}
-                onClick={() => handleView(view)}
-              />
-            ))}
-        </dialog>
-        {viewSelected?.touchs.map((touch, index) => (
-          <>
-            <Image
-              key={index}
-              url={`../assets/img/touch${touchSelected?.id === touch.id ? '_selected' : ''}.png`}
-              className='absolute cursor-pointer z-20'
-              style={{ left: `${touch.x}`, top: `${touch.y}` }}
-              onClick={() => handleTouch(touch)}
+          <dialog open={dialogOpen} className='absolute top-16 right-2/3 bg-white p-4 rounded-xl z-30'>
+            <SubTitle title='Escolher outra área' className='font-bold cursor-pointer mb-4' onClick={handleHome} />
+            <SubTitle
+              title='Mudar posição da área atual ▼'
+              className='font-bold cursor-pointer'
+              onClick={() => setSelectViewOpen(!selectViewOpen)}
             />
-            {touchTextures.find(el => el.touchID === touch.id)?.textureID && (
-              <>
-                <img
-                  key={index}
-                  src={`../assets/img/materials/${touchTextures.find(el => el.touchID === touch.id)?.textureID}.png`}
-                  className='absolute z-20 w-10 h-10 border-2 border-black shadow-xl'
-                  style={{ left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`, top: `${touch.y}` }}
-                />
+            {selectViewOpen &&
+              views.map((view, index) => (
                 <SubTitle
                   key={index}
-                  title={
-                    localTextures.find(el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID)
-                      ?.name || ''
-                  }
-                  className='absolute z-20 font-bold'
-                  style={{
-                    left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`,
-                    top: `${parseInt(touch.y.substring(0, touch.y.length - 1)) + 5}%`,
-                    textShadow: '2px 2px 4px white',
-                  }}
+                  title={`► ${view.name}`}
+                  className={clsx(
+                    'ml-4 font-bold cursor-pointer mt-4',
+                    viewSelected?.id === view.id && 'text-primary-500',
+                  )}
+                  onClick={() => handleView(view)}
                 />
-              </>
-            )}
-          </>
-        ))}
-        {enviroment && (
-          <div className='flex'>
-            <img src={imageTimestamp} alt='enviroment' className='h-screen w-full z-10' onClick={handleCancelSelect} />
-          </div>
-        )}
-        {touchSelected && (
-          <div className='absolute w-80 bg-white h-screen right-0 px-4 py-10 items-center flex flex-col justify-between z-20'>
-            <SubTitle title='Lista de texturas' className='font-bold cursor-pointer text-center mb-4' />
-            <Input
-              placeholder='Buscar...'
-              className='w-full rounded-2xl mb-4'
-              onChange={e => handleFilterTextures(e.target.value)}
-            />
-            <div className='overflow-y-auto h-[600px] w-full'>
-              {textures.map((texture, index) => (
-                <div key={index} className='w-full mt-2 cursor-pointer'>
-                  <img
-                    src={`../assets/img/materials/${texture.id}.png`}
-                    className={clsx(
-                      'rounded-md h-10 w-full border-2 ',
-                      textureSelected?.id === texture.id && 'border-primary-500',
-                    )}
-                    onClick={() => handleTexture(texture)}
-                  />
-                  <SubTitle title={texture.name} className='text-center text-secondary-600' />
-                </div>
               ))}
-            </div>
-            <Button
-              title='Sincronizar'
-              className='w-full mb-2'
-              active={!sync}
-              onClick={async () => {
-                if (!sync) {
-                  setTextureLoading(true);
-                  await update_texture_to_seller();
-                  setTextureLoading(false);
-                }
-              }}
-            />
-            <div>
-              <input
-                onChange={() => setSync(!sync)}
-                type='checkbox'
-                id='sync'
-                name='sync'
-                checked={sync}
-                className='mt-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
+          </dialog>
+          {viewSelected?.touchs.map((touch, index) => (
+            <>
+              <Image
+                key={index}
+                url={`../assets/img/touch${touchSelected?.id === touch.id ? '_selected' : ''}.png`}
+                className='absolute cursor-pointer z-20'
+                style={{ left: `${touch.x}`, top: `${touch.y}` }}
+                onClick={() => handleTouch(touch)}
               />
-              <label htmlFor='sync' className='font-poopins text-sm ml-2'>
-                Sincronizar todas as mudancas
-              </label>
+              {touchTextures.find(el => el.touchID === touch.id)?.textureID && (
+                <>
+                  <img
+                    key={index}
+                    src={`../assets/img/materials/${touchTextures.find(el => el.touchID === touch.id)?.textureID}.png`}
+                    className='absolute z-20 w-10 h-10 border-2 border-black shadow-xl'
+                    style={{ left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`, top: `${touch.y}` }}
+                  />
+                  <SubTitle
+                    key={index}
+                    title={
+                      localTextures.find(el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID)
+                        ?.name || ''
+                    }
+                    className='absolute z-20 font-bold'
+                    style={{
+                      left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`,
+                      top: `${parseInt(touch.y.substring(0, touch.y.length - 1)) + 5}%`,
+                      textShadow: '2px 2px 4px white',
+                    }}
+                  />
+                </>
+              )}
+            </>
+          ))}
+          {enviroment && (
+            <div className='flex'>
+              <img
+                src={imageTimestamp}
+                alt='enviroment'
+                className='h-screen w-full z-10'
+                onClick={handleCancelSelect}
+              />
             </div>
-          </div>
-        )}
-      </div>
-    </Loading>
+          )}
+          {touchSelected && (
+            <div className='absolute w-80 bg-white h-screen right-0 px-4 py-10 items-center flex flex-col justify-between z-20'>
+              <SubTitle title='Lista de texturas' className='font-bold cursor-pointer text-center mb-4' />
+              <Input
+                placeholder='Buscar...'
+                className='w-full rounded-2xl mb-4'
+                onChange={e => handleFilterTextures(e.target.value)}
+              />
+              <div className='overflow-y-auto h-[600px] w-full'>
+                {textures.map((texture, index) => (
+                  <div key={index} className='w-full mt-2 cursor-pointer'>
+                    <img
+                      src={`../assets/img/materials/${texture.id}.png`}
+                      className={clsx(
+                        'rounded-md h-10 w-full border-2 ',
+                        textureSelected?.id === texture.id && 'border-primary-500',
+                      )}
+                      onClick={() => handleTexture(texture)}
+                    />
+                    <SubTitle title={texture.name} className='text-center text-secondary-600' />
+                  </div>
+                ))}
+              </div>
+              <Button
+                title='Sincronizar'
+                className='w-full mb-2'
+                active={!sync}
+                onClick={async () => {
+                  if (!sync) {
+                    setTextureLoading(true);
+                    await update_texture_to_seller();
+                    setTextureLoading(false);
+                  }
+                }}
+              />
+              <div>
+                <input
+                  onChange={() => setSync(!sync)}
+                  type='checkbox'
+                  id='sync'
+                  name='sync'
+                  checked={sync}
+                  className='mt-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600'
+                />
+                <label htmlFor='sync' className='font-poopins text-sm ml-2'>
+                  Sincronizar todas as mudancas
+                </label>
+              </div>
+            </div>
+          )}
+        </div>
+      </Loading>
+    </>
   );
 }
 

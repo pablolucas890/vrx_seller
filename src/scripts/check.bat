@@ -46,7 +46,11 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 dir "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env1.skp" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-    echo - Enviroments nao encontrados
+    echo - Enviroment nao encontrado
+)
+dir "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env2.skp" >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+    echo - Enviroment nao encontrado
 )
 
 goto :listgems

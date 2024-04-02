@@ -17,9 +17,6 @@ IF %ERRORLEVEL% NEQ 0 (
 
 :copymaterials
 echo - Copiando os arquivos de materiais
-for /D %%D in ("%SKETCHUP_BASE_FOLDER%*") do (
-    set LAST_SKETCHUP=%%D
-)
 xcopy "%OLD_DIR%\build\assets\img\materials\*" "%LAST_SKETCHUP%\SketchUp\Materials" /E /I /Y >NUL 2>&1
 
 :plugin

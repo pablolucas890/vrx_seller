@@ -54,7 +54,7 @@ end
 get '/open_sketchup' do
   project = params['project']
   sketchup_path = "C:\\Program Files\\SketchUp\\SketchUp #{latest_year}\\SketchUp.exe"
-  skp_file_path = "C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Plugins\\environments\\#{project}.skp\""
+  skp_file_path = "C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Plugins\\environments\\#{project}.skp"
   system("start \"\" \"#{sketchup_path}\" \"#{skp_file_path}\"")
 end
 
