@@ -92,6 +92,14 @@ export function Simulation() {
     const token = localStorage.getItem('token');
     if (!token) window.location.href = '/';
 
+    async function getLocalMaterials(): Promise<string[]> {
+      const resLocalMaterials = await fetch(
+        `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/materials`,
+      );
+      const localMaterials: string[] = await resLocalMaterials.json();
+      return localMaterials;
+    }
+
     await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/materials`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -100,18 +108,18 @@ export function Simulation() {
       .then(async res => {
         if (!res.ok) window.location.href = '/';
         const { materials }: { materials: string[] } = await res.json();
-        const resMaterials = await fetch(
-          `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/materials`,
-        );
-        const localMaterials = await resMaterials.json();
+        let localMaterials = await getLocalMaterials();
         const newMaterials = materials.filter(el => !localMaterials.includes(el));
         newMaterials.forEach(async (material: string) => {
           await fetch(
             `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/material?material=${material}`,
           );
         });
-        setLocalTextures(materials.map((m: string) => ({ id: m.replace('.png', ''), name: m.replace('.png', '') })));
-        setTextures(materials.map((m: string) => ({ id: m.replace('.png', ''), name: m.replace('.png', '') })));
+        localMaterials = await getLocalMaterials();
+        setLocalTextures(
+          localMaterials.map((m: string) => ({ id: m.replace('.png', ''), name: m.replace('.png', '') })),
+        );
+        setTextures(localMaterials.map((m: string) => ({ id: m.replace('.png', ''), name: m.replace('.png', '') })));
       })
       .catch(() => {
         localStorage.removeItem('token');

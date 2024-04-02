@@ -96,3 +96,15 @@ get '/material' do
     file.write(response.body)
   end
 end
+
+post '/upload_texture' do
+  file = params[:file]
+  file_content = file[:tempfile].read
+  File.open("C:\\Users\\#{username}\\AppData\\Roaming\\SketchUp\\SketchUp #{latest_year}\\SketchUp\\Materials\\#{file[:filename]}", 'wb') do |f|
+    f.write(file_content)
+  end
+  File.open("C:\\Users\\#{username}\\AppData\\Roaming\\Apache24\\htdocs\\assets\\img\\materials\\#{file[:filename]}", 'wb') do |f|
+    f.write(file_content)
+  end
+  body 'true'
+end

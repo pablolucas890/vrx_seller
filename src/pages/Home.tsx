@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import React from 'react';
-import Button from '../components/Button';
 import Image from '../components/Image';
 import Loading from '../components/Loading';
 import SubTitle from '../components/SubTitle';
@@ -14,6 +13,7 @@ import {
   SKETCHUP_SERVER_PROTOCOL,
   STRUCTURE,
 } from '../global/utils';
+import { IoMenu } from 'react-icons/io5';
 
 interface IVerifyResponse {
   message: string;
@@ -26,6 +26,7 @@ interface IVerifyResponse {
 export function Home() {
   const environments = STRUCTURE.environments;
   const [loading, setLoading] = React.useState(true);
+  const [dialogOpen, setDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
     localStorage.removeItem('touchTextures');
@@ -55,6 +56,25 @@ export function Home() {
     }
   }
 
+  async function handleUpload() {
+    const fileInput = document.getElementById('file') as HTMLInputElement;
+    fileInput.click();
+  }
+
+  async function handleSaveTexture(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!e.target.files) return console.error('Arquivo não encontrado');
+
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    fetch(`${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/upload_texture`, {
+      method: 'POST',
+      body: formData,
+    })
+      .then(async res => await res.json())
+      .then(res => (res ? alert('Textura adicionada com sucesso') : alert('Erro ao adicionar textura')))
+      .catch(err => console.error(err));
+  }
   async function verifyToken() {
     const token = localStorage.getItem('token');
     if (!token) window.location.href = '/';
@@ -86,7 +106,18 @@ export function Home() {
 
   return (
     <Loading isLoading={loading}>
-      <Button title='Sair' onClick={handleLogout} active className='absolute top-5 left-10 shadow-xl' />
+      <IoMenu
+        className='absolute left-10 top-10 text-4xl text-white bg-primary-500 rounded-3xl p-1 z-20'
+        onClick={() => setDialogOpen(!dialogOpen)}
+      />
+      <dialog
+        open={dialogOpen}
+        className='absolute top-16 right-2/3 bg-secondary-100 p-4 rounded-xl z-30 border-2 border-primary-900'
+      >
+        <SubTitle title='Sair' className='font-bold cursor-pointer mb-4' onClick={handleLogout} />
+        <SubTitle title='Adicionar Texura' className='font-bold cursor-pointer mb-4' onClick={handleUpload} />
+        <input type='file' id='file' accept='.png' style={{ display: 'none' }} onChange={handleSaveTexture} />
+      </dialog>
       <div className='flex flex-col items-center justify-center h-screen gap-4'>
         <Title title='Escolha o espaço' />
         <SubTitle title='Toque em um dos ambientes abaixo e comece a simular' />
