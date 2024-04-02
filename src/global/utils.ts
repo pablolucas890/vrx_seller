@@ -1,7 +1,7 @@
 import { IStructure } from './props';
 
 export const API_SERVER_PORT = 8080;
-export const API_SERVER_HOST = '192.168.68.131';
+export const API_SERVER_HOST = '15.229.252.34';
 export const API_SERVER_PROTOCOL = 'http';
 export const SKETCHUP_SERVER_PORT = 4567;
 export const SKETCHUP_SERVER_HOST = 'localhost';

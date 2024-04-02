@@ -14,7 +14,7 @@ set :allow_headers, "content-type,if-modified-since"
 set :expose_headers, "location,link"
 set :allow_credentials, true
 
-DOWNLOAD_URL='http://192.168.68.131:8080/download/'
+DOWNLOAD_URL='http://15.229.252.34:8080/download/'
 username = ENV['USERNAME']
 is_model_open = false
 
