@@ -77,7 +77,11 @@ export function Home() {
   }
   async function verifyToken() {
     const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/';
+    if (!token) {
+      localStorage.removeItem('token');
+      await new Promise(r => setTimeout(r, 2000));
+      window.location.href = '/';
+    }
 
     await fetch(`${API_SERVER_PROTOCOL}://${API_SERVER_HOST}:${API_SERVER_PORT}/verify`, {
       method: 'POST',
@@ -85,13 +89,18 @@ export function Home() {
       body: JSON.stringify({ token }),
     })
       .then(async res => {
-        if (!res.ok) window.location.href = '/';
+        if (!res.ok) {
+          localStorage.removeItem('token');
+          await new Promise(r => setTimeout(r, 2000));
+          window.location.href = '/';
+        }
         const { decoded }: IVerifyResponse = await res.json();
         console.log(decoded);
       })
-      .catch(err => {
+      .catch(async err => {
         console.error(err);
         localStorage.removeItem('token');
+        await new Promise(r => setTimeout(r, 2000));
         window.location.href = '/';
       });
   }

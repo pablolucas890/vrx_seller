@@ -20,7 +20,7 @@ export default function Login() {
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) window.location.href = '/home';
+    if (token && token !== '') window.location.href = '/home';
   }, []);
 
   async function handleLogin() {
