@@ -17,6 +17,7 @@ export default function Login() {
   const [forgotPassword, setForgotPassword] = React.useState(false);
 
   const login_image = '../assets/img/login_image.png';
+  const logologin = '../assets/img/logologin.png';
 
   React.useEffect(() => {
     const token = localStorage.getItem('token');
@@ -71,7 +72,7 @@ export default function Login() {
           backgroundPosition: 'center',
         }}
       >
-        <Title title='Logo' className='text-white' />
+        <img src={logologin} alt='logo' className='w-1/2 animate-pulse' />
       </div>
       <div className='md:w-2/4 sm:w-full h-screen items-center justify-center flex'>
         <div className='gap-4'>

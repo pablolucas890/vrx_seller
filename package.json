@@ -1,10 +1,10 @@
 {
-  "name": "vrx_seller",
+  "name": "VRX",
   "version": "1.0.0",
   "private": true,
   "main": "main.js",
   "author": "Pablo Santos",
-  "description": "VRX Seller",
+  "description": "VRX App",
   "type": "module",
   "homepage": ".",
   "dependencies": {
