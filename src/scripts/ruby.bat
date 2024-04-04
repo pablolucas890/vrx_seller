@@ -2,18 +2,14 @@
 call "%~dp0\utils.bat"
 
 :installruby
-where ruby >NUL 2>&1
+echo - Instalando o Ruby
+choco install -y ruby --version=3.3.0.1 --force
 IF %ERRORLEVEL% NEQ 0 (
-    echo - Instalando o Ruby
-    choco install -y ruby --force
-    IF %ERRORLEVEL% NEQ 0 (
-        echo - Falha ao instalar o Ruby. Por favor, instale manualmente e tente novamente.
-        exit 1
-    )
-    echo - O Ruby foi instalado com sucesso.
-) ELSE (
-    echo - Ruby ja esta instalado
+    echo - Falha ao instalar o Ruby. Por favor, instale manualmente e tente novamente.
+    exit 1
 )
+echo - O Ruby foi instalado com sucesso.
+
 
 :copymaterials
 echo - Copiando os arquivos de materiais
@@ -22,6 +18,7 @@ xcopy "%OLD_DIR%\build\assets\img\materials\*" "%LAST_SKETCHUP%\SketchUp\Materia
 :plugin
 dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
+    mkdir "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo - Baixando wget
     choco install wget -y --force
@@ -34,7 +31,14 @@ IF %ERRORLEVEL% NEQ 0 (
     rmdir "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main" /s /q
     echo -   Baixando arquivos de ambiente
     for %%i in (1 2 3 4 5 6 7) do (
-        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp"
+        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" 2>&1
+        if %ERRORLEVEL% neq 0 (
+            echo !!! ERRO Falha ao baixar o arquivo. verifique a conexao ou contate o suporte !!!
+            exit 1
+        ) else (
+            echo Download %%i/7 concluido com sucesso.
+        )        
+
     )
     echo - Plugin VRX foi instalado com sucesso
 ) ELSE (
@@ -55,7 +59,7 @@ goto :end
 
 :listgems
 echo - Instalando as gems
-FOR %%G IN (sinatra httparty sinatra-cors websocket-client-simple json http uri) DO (
+FOR %%G IN (sinatra httparty sinatra-cors json http uri rackup) DO (
     CALL :installGem %%G
 )
 

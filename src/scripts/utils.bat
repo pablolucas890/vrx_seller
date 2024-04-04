@@ -16,6 +16,7 @@ set REPO_URL=https://github.com/Jadyla/vrx_plugin/archive/refs/heads/main.zip
 set ZIP_FILE="%USERPROFILE%\Downloads\vrx_plugin.zip"
 set DOWNLOAD_URL="http://15.229.252.34:8080/download"
 set HTDOCS_FOLDER=%USERPROFILE%\AppData\Roaming\Apache24\htdocs
+set RUBY_FOLDER="C:\tools\ruby33\bin\bundler.bat"
 
 for /D %%D in ("%SKETCHUP_BASE_FOLDER%*") do (
     set LAST_SKETCHUP=%%D
