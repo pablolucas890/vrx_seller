@@ -31,7 +31,7 @@ findstr /c:"# VRX Configs" %HTTPD_CONF_FILE% > NUL || (
 )
 
 :installruby
-where ruby >NUL 2>&1
+dir "%RUBY_FOLDER%" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Ruby nao encontrado
 )

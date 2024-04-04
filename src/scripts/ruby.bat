@@ -2,18 +2,14 @@
 call "%~dp0\utils.bat"
 
 :installruby
-where ruby >NUL 2>&1
+echo - Instalando o Ruby
+choco install -y ruby --version=3.3.0.1 --force
 IF %ERRORLEVEL% NEQ 0 (
-    echo - Instalando o Ruby
-    choco install -y ruby --force
-    IF %ERRORLEVEL% NEQ 0 (
-        echo - Falha ao instalar o Ruby. Por favor, instale manualmente e tente novamente.
-        exit 1
-    )
-    echo - O Ruby foi instalado com sucesso.
-) ELSE (
-    echo - Ruby ja esta instalado
+    echo - Falha ao instalar o Ruby. Por favor, instale manualmente e tente novamente.
+    exit 1
 )
+echo - O Ruby foi instalado com sucesso.
+
 
 :copymaterials
 echo - Copiando os arquivos de materiais
