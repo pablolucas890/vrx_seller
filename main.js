@@ -116,6 +116,7 @@ app
       // Check all dependencies to run the app
       await new Promise(resolve => {
         exec('.\\src\\scripts\\check.bat', (error, stdout) => {
+          console.log(stdout);
           if (stdout) needInstall = true;
           resolve();
         });
