@@ -55,7 +55,7 @@ goto :end
 
 :listgems
 echo - Instalando as gems
-FOR %%G IN (sinatra httparty sinatra-cors websocket-client-simple json http uri) DO (
+FOR %%G IN (sinatra httparty sinatra-cors json http uri rackup) DO (
     CALL :installGem %%G
 )
 

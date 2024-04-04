@@ -1,11 +1,8 @@
 require 'sinatra'
 require 'sinatra/cors'
 require 'json'
-require 'faye/websocket'
 require 'httparty'
 
-set :server, 'puma'
-set :sockets, []
 set :bind, '0.0.0.0'
 
 set :allow_origin, ["http://localhost", "http://localhost:3000"]
