@@ -18,6 +18,7 @@ xcopy "%OLD_DIR%\build\assets\img\materials\*" "%LAST_SKETCHUP%\SketchUp\Materia
 :plugin
 dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
+    mkdir "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo - Baixando wget
     choco install wget -y --force
@@ -30,7 +31,14 @@ IF %ERRORLEVEL% NEQ 0 (
     rmdir "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main" /s /q
     echo -   Baixando arquivos de ambiente
     for %%i in (1 2 3 4 5 6 7) do (
-        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp"
+        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" 2>&1
+        if %ERRORLEVEL% neq 0 (
+            echo !!! ERRO Falha ao baixar o arquivo. verifique a conexao ou contate o suporte !!!
+            exit 1
+        ) else (
+            echo Download %%i/7 concluido com sucesso.
+        )        
+
     )
     echo - Plugin VRX foi instalado com sucesso
 ) ELSE (

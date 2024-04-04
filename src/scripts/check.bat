@@ -44,13 +44,10 @@ dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Plugin nao encontrado
 )
-dir "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env1.skp" >NUL 2>&1
-IF %ERRORLEVEL% NEQ 0 (
-    echo - Enviroment nao encontrado
-)
-dir "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env2.skp" >NUL 2>&1
-IF %ERRORLEVEL% NEQ 0 (
-    echo - Enviroment nao encontrado
+for /l %%i in (1,1,7) do (
+    IF not exist "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" (
+        echo - Enviroment %%i nao encontrado
+    )
 )
 
 goto :listgems
