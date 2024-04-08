@@ -60,7 +60,7 @@ IF %ERRORLEVEL% NEQ 0 (
 goto :end
 
 :listgems
-FOR %%G IN (sinatra httparty sinatra-cors websocket-client-simple json http uri) DO (
+FOR %%G IN (sinatra httparty sinatra-cors json http uri rackup) DO (
     CALL :installGem %%G
 )
 
