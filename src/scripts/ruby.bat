@@ -15,13 +15,14 @@ echo - O Ruby foi instalado com sucesso.
 echo - Copiando os arquivos de materiais
 xcopy "%OLD_DIR%\build\assets\img\materials\*" "%LAST_SKETCHUP%\SketchUp\Materials" /E /I /Y >NUL 2>&1
 
+echo - Baixando wget
+choco install wget -y --force
+
 :plugin
 dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     mkdir "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo "%LAST_SKETCHUP%\SketchUp\Plugins"
-    echo - Baixando wget
-    choco install wget -y --force
     echo - Baixando Plugin VRX
     wget %REPO_URL% -O %ZIP_FILE%
     echo -   Extraindo arquivo zip...
@@ -29,20 +30,24 @@ IF %ERRORLEVEL% NEQ 0 (
     xcopy "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main\*" "%LAST_SKETCHUP%\SketchUp\Plugins" /E /I /Y >NUL 2>&1
     del %ZIP_FILE%
     rmdir "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main" /s /q
-    echo -   Baixando arquivos de ambiente
-    for %%i in (1 2 3 4 5 6 7) do (
-        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" 2>&1
+    echo - Plugin VRX foi instalado com sucesso
+) ELSE (
+    echo - Plugin VRX ja esta instalado
+)
+
+:enviroments
+echo -   Baixando arquivos de ambiente
+for /l %%i in (1,1,7) do (
+    IF not exist "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" (
+        echo - Enviroment %%i ausente, realizando o download...
+        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" >NUL 2>&1
         if %ERRORLEVEL% neq 0 (
             echo !!! ERRO Falha ao baixar o arquivo. verifique a conexao ou contate o suporte !!!
             exit 1
         ) else (
             echo Download %%i/7 concluido com sucesso.
-        )        
-
+        )
     )
-    echo - Plugin VRX foi instalado com sucesso
-) ELSE (
-    echo - Plugin VRX ja esta instalado
 )
 
 goto :listgems
