@@ -48,7 +48,7 @@ IF %ERRORLEVEL% NEQ 0 (
 goto :listgems
 
 :installGem
-gem list | findstr %1 >NUL
+%GEM_BIN_FILE list | findstr %1 >NUL
 IF %ERRORLEVEL% NEQ 0 (
     echo -   Instalando a gem %1
     gem install %1

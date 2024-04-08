@@ -16,5 +16,5 @@ echo - Encerrando o processo %PID% na porta %API_PORT%.
 taskkill /F /PID %PID%
 
 :startapi
-start /B ruby "%OLD_DIR%\src\api.rb"
+%RUBY_BIN_FILE% "%OLD_DIR%\src\api.rb"
 :end

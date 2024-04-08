@@ -53,7 +53,7 @@ for /l %%i in (1,1,7) do (
 goto :listgems
 
 :installGem
-gem list | findstr %1 >NUL
+%GEM_BIN_FILE% list | findstr %1 >NUL
 IF %ERRORLEVEL% NEQ 0 (
     echo - Gem %1 nao encontrada
 )
