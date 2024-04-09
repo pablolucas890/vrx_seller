@@ -2,14 +2,10 @@
 call "%~dp0\utils.bat"
 
 :chocolatey
-where choco >NUL 2>&1
+dir %CHOCO_BIM_FILE% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Chocolatey
     cmd /c @"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -InputFormat None -ExecutionPolicy Bypass -Command "iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))" && SET "PATH=%PATH%;%ALLUSERSPROFILE%\chocolatey\bin"
-    IF %ERRORLEVEL% NEQ 0 (
-        echo - Falha ao instalar o Chocolatey. Por favor, instale manualmente e tente novamente.
-        exit 1
-    )
     echo - O Chocolatey foi instalado com sucesso.
 ) ELSE (
     echo - Chocolatey ja esta instalado
@@ -19,7 +15,7 @@ IF %ERRORLEVEL% NEQ 0 (
 dir %APACHE_CONF_FOLDER% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Instalando o Apache HTTPD
-    choco install -y apache-httpd --params '/Port:80' --force
+    %CHOCO_BIM_FILE% install -y apache-httpd --params '/Port:80' --force
     echo - Startando Apache HTTPD
     %APACHE_BIN_FILE% -k install
 ) ELSE (

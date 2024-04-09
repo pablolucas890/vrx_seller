@@ -42,7 +42,8 @@
     "extends": null,
     "win": {
       "target": "nsis",
-      "icon": "build/assets/favicon.ico"
+      "icon": "build/assets/favicon.ico",
+      "requestedExecutionLevel": "requireAdministrator"
     },
     "nsis": {
       "deleteAppDataOnUninstall": true,
@@ -50,7 +51,7 @@
       "oneClick": false,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
-      "runAfterFinish": false,
+      "runAfterFinish": true,
       "installerHeaderIcon": "build/assets/favicon.ico"
     },
     "linux": {

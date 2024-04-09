@@ -2,7 +2,7 @@
 call "%~dp0\utils.bat"
 
 :chocolatey
-where choco >NUL 2>&1
+dir %CHOCO_BIM_FILE% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
     echo - Chocolatey nao encontrado
 )

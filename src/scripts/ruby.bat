@@ -3,7 +3,7 @@ call "%~dp0\utils.bat"
 
 :installruby
 echo - Instalando o Ruby
-choco install -y ruby --version=3.3.0.1 --force
+%CHOCO_BIM_FILE% install -y ruby --version=3.3.0.1 --force
 IF %ERRORLEVEL% NEQ 0 (
     echo - Falha ao instalar o Ruby. Por favor, instale manualmente e tente novamente.
     exit 1
@@ -16,7 +16,7 @@ echo - Copiando os arquivos de materiais
 xcopy "%OLD_DIR%\build\assets\img\materials\*" "%LAST_SKETCHUP%\SketchUp\Materials" /E /I /Y >NUL 2>&1
 
 echo - Baixando wget
-choco install wget -y --force
+%CHOCO_BIM_FILE% install wget -y --force
 
 :plugin
 dir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" >NUL 2>&1
@@ -35,28 +35,13 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Plugin VRX ja esta instalado
 )
 
-:enviroments
-echo -   Baixando arquivos de ambiente
-for /l %%i in (1,1,7) do (
-    IF not exist "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" (
-        echo - Enviroment %%i ausente, realizando o download...
-        wget --no-check-certificate "%DOWNLOAD_URL%/env%%i.skp" -O "%LAST_SKETCHUP%\SketchUp\Plugins\environments\env%%i.skp" >NUL 2>&1
-        if %ERRORLEVEL% neq 0 (
-            echo !!! ERRO Falha ao baixar o arquivo. verifique a conexao ou contate o suporte !!!
-            exit 1
-        ) else (
-            echo Download %%i/7 concluido com sucesso.
-        )
-    )
-)
-
 goto :listgems
 
 :installGem
 %GEM_BIN_FILE% list | findstr %1 >NUL
 IF %ERRORLEVEL% NEQ 0 (
     echo -   Instalando a gem %1
-    gem install %1
+    %GEM_BIN_FILE% install %1
 ) ELSE (
     echo -   Gem %1 ja esta instalada
 )

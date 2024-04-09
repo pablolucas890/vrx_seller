@@ -15,6 +15,7 @@ export default function Login() {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [forgotPassword, setForgotPassword] = React.useState(false);
+  const [error, setError] = React.useState('');
 
   const login_image = '../assets/img/login_image.png';
   const logologin = '../assets/img/logologin.png';
@@ -34,10 +35,10 @@ export default function Login() {
           if (res.ok) {
             alert('Nosso time de suporte entrará em contato');
             window.location.href = '/';
-          } else alert('Erro interno do servidor');
+          } else setError('Erro ao enviar e-mail');
         })
         .catch(() => {
-          alert('Erro interno do servidor');
+          setError('Erro ao enviar e-mail');
         });
     }
     if (!email || !password) return;
@@ -51,14 +52,13 @@ export default function Login() {
         if (res.ok) {
           const { token }: ILoginResponse = await res.json();
           if (token) {
-            alert('Login realizado com sucesso');
             localStorage.setItem('token', token);
             window.location.href = '/home';
-          } else alert('Erro ao realizar login');
-        } else alert('Erro ao realizar login');
+          } else setError('Erro ao realizar login');
+        } else setError('Erro ao realizar login');
       })
       .catch(() => {
-        alert('Erro ao realizar login');
+        setError('Erro ao realizar login');
       });
   }
 
@@ -85,6 +85,7 @@ export default function Login() {
             type='email'
             value={email}
             onChange={e => setEmail(e.target.value)}
+            onKeyUp={e => e.key === 'Enter' && handleLogin()}
             className='mb-4 w-[300px]'
           />
           {!forgotPassword && (
@@ -95,9 +96,11 @@ export default function Login() {
               type='password'
               value={password}
               onChange={e => setPassword(e.target.value)}
+              onKeyUp={e => e.key === 'Enter' && handleLogin()}
               className='mb-6 w-[300px]'
             />
           )}
+          {error && <SubTitle title={error} className='text-red-500 mb-4' />}
           <Button
             onClick={handleLogin}
             hasIcon

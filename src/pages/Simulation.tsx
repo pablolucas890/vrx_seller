@@ -185,6 +185,12 @@ export function Simulation() {
     setImageTimestamp(`../assets/img/prints/${enviroment}-${view?.id}.png?${Date.now()}`);
   }
 
+  async function completeImageUpdate(enviroment: string, viewSelected: IView) {
+    for (let i = 0; i < 20; i++) {
+      setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
+      await new Promise(r => setTimeout(r, 200));
+    }
+  }
   async function update_texture_to_seller() {
     setTextureLoading(true);
     const imageSrc = imageTimestamp;
@@ -193,8 +199,9 @@ export function Simulation() {
       `${SKETCHUP_SERVER_PROTOCOL}://${SKETCHUP_SERVER_HOST}:${SKETCHUP_SERVER_PORT}/update?project=${enviroment}&view=${viewSelected.id}`,
     );
     await waitForImageUpdate(imageSrc, oldTimeStamp);
-    await new Promise(r => setTimeout(r, 3500));
+    await new Promise(r => setTimeout(r, 2000));
     setImageTimestamp(`../assets/img/prints/${enviroment}-${viewSelected?.id}.png?${Date.now()}`);
+    completeImageUpdate(enviroment, viewSelected);
     setTextureLoading(false);
   }
 
@@ -297,7 +304,7 @@ export function Simulation() {
             </>
           ))}
           {enviroment && (
-            <div className='flex'>
+            <div className='flex flex-col items-center justify-center w-full h-screen'>
               <img
                 src={imageTimestamp}
                 alt='enviroment'

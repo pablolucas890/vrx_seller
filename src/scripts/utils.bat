@@ -19,6 +19,7 @@ set HTDOCS_FOLDER=%USERPROFILE%\AppData\Roaming\Apache24\htdocs
 set RUBY_FOLDER="C:\tools\ruby33\bin\bundler.bat"
 set GEM_BIN_FILE="C:\tools\ruby33\bin\gem.cmd"
 set RUBY_BIN_FILE="C:\tools\ruby33\bin\ruby.exe"
+set CHOCO_BIM_FILE="C:\ProgramData\chocolatey\bin\choco.exe"
 
 for /D %%D in ("%SKETCHUP_BASE_FOLDER%*") do (
     set LAST_SKETCHUP=%%D

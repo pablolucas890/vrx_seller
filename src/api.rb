@@ -6,7 +6,7 @@ require 'httparty'
 set :bind, '0.0.0.0'
 
 set :allow_origin, ["http://localhost", "http://localhost:3000"]
-set :allow_methods, "GET"
+set :allow_methods, "GET,POST"
 set :allow_headers, "content-type,if-modified-since"
 set :expose_headers, "location,link"
 set :allow_credentials, true

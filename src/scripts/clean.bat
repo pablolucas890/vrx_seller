@@ -4,7 +4,7 @@ call "%~dp0\utils.bat"
 :apache
 %APACHE_BIN_FILE% -k stop
 %APACHE_BIN_FILE% -k uninstall
-choco uninstall -y apache-httpd
+%CHOCO_BIM_FILE% uninstall -y apache-httpd
 
 
 :rubyapi
@@ -20,7 +20,7 @@ goto :removeplugin
 :portfound
 echo - Encerrando o processo %PID% na porta %API_PORT%.
 taskkill /F /PID %PID%
-choco uninstall -y ruby
+%CHOCO_BIM_FILE% uninstall -y ruby
 
 :removeplugin
 rmdir "%LAST_SKETCHUP%\SketchUp\Plugins\Sketchup_VRX" /s /q
