@@ -67,3 +67,7 @@
     </Directory>
     ```
 - Copy public files to `www` folder
+
+### Steps to install
+
+- <a href='https://www.canva.com/design/DAGB8GF8_iY/9czS3Rr9SnLpJloC4u_6Cg/view?utm_content=DA[…]_iY&utm_campaign=designshare&utm_medium=link&utm_source=editor'> Steps </a>
