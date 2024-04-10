@@ -202,7 +202,7 @@ app
           await new Promise((resolve, reject) => {
             progressWindow.loadURL(getHtml('Verificando a instalação do Sketchup...', 10, log));
             exec(`dir ${sketchup_folder}`, async error => {
-              if (error) reject('Intalacao do Sketchup não encontrada');
+              if (error) reject('Intalacao do Sketchup não encontrada, verifique se o Sketchup está instalado e sua conta está logada');
               log = 'Instalação do Sketchup encontrada com sucesso';
               resolve();
             });

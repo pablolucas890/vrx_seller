@@ -24,7 +24,7 @@ IF %ERRORLEVEL% NEQ 0 (
     mkdir "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo "%LAST_SKETCHUP%\SketchUp\Plugins"
     echo - Baixando Plugin VRX
-    wget %REPO_URL% -O %ZIP_FILE%
+    %WGET_BIN_FILE% %REPO_URL% -O %ZIP_FILE%
     echo -   Extraindo arquivo zip...
     tar -xf %ZIP_FILE% -C "%LAST_SKETCHUP%\SketchUp\Plugins"
     xcopy "%LAST_SKETCHUP%\SketchUp\Plugins\vrx_plugin-main\*" "%LAST_SKETCHUP%\SketchUp\Plugins" /E /I /Y >NUL 2>&1

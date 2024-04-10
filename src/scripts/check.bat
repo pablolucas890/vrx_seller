@@ -7,6 +7,13 @@ IF %ERRORLEVEL% NEQ 0 (
     echo - Chocolatey nao encontrado
 )
 
+:wget
+
+dir %WGET_BIN_FILE% >NUL 2>&1
+IF %ERRORLEVEL% NEQ 0 (
+    echo - Wget nao encontrado
+)
+
 :apache
 dir %APACHE_CONF_FOLDER% >NUL 2>&1
 IF %ERRORLEVEL% NEQ 0 (
