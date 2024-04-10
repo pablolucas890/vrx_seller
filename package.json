@@ -47,7 +47,7 @@
     },
     "nsis": {
       "deleteAppDataOnUninstall": true,
-      "include": "build/installer/nsis-installer.nsh",
+      "include": "build/installer.nsh",
       "oneClick": false,
       "allowElevation": true,
       "allowToChangeInstallationDirectory": true,

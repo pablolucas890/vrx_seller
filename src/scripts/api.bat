@@ -1,6 +1,11 @@
 @echo off
 call "%~dp0\utils.bat"
 
+:copyclean
+echo - Copiando arquivos de limpeza
+xcopy /s /y "%OLD_DIR%\src\scripts\utils.bat" "%USERPROFILE%\AppData\Local\Temp"
+xcopy /s /y "%OLD_DIR%\src\scripts\clean.bat" "%USERPROFILE%\AppData\Local\Temp"
+
 :restartapache
 echo - Restartando Apache
 echo -     Matando Processos na porta 80
@@ -26,7 +31,7 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":%API_PORT%"') do (
     goto :portfound
 )
 
-:portnoutfound
+:portnotfound
 echo - Processo na porta %API_PORT% não encontrado.
 goto :startapi
 
