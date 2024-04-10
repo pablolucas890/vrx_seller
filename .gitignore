@@ -21,4 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-/dist
+/dist/win-unpacked
+/dist/*.yml
+/dist/*.blockmap
+/dist/*.yaml
