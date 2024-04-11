@@ -5,7 +5,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 import { exec } from 'child_process';
 
 // util functions
-function getHtml(message, percent, log) {
+function getHtml(message, percent) {
   const random = Math.random() * 5;
   percent = (percent - random).toFixed(2);
 
@@ -21,18 +21,21 @@ function getHtml(message, percent, log) {
       <style>
         body {
           font-family: 'Poppins', sans-serif;
+          background-image: url('http://15.229.252.34:8080/download/install-bg.jpg');
+          background-size: cover;
           display: flex;
-          justify-content: center;
-          align-items: center;
           flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          margin: 0;
         }
-
         .loader {
-          border: 16px solid rgb(14, 25, 83);
-          border-top: 16px solid rgb(134, 138, 165);
+          border: 8px solid rgb(14, 25, 83);
+          border-top: 8px solid rgb(160, 205, 245);
           border-radius: 50%;
-          width: 50px;
-          height: 50px;
+          width: 30px;
+          height: 30px;
           animation: spin 2s linear infinite;
         }
 
@@ -42,17 +45,14 @@ function getHtml(message, percent, log) {
         }
       </style>
       <body>
-        <h1>${message}</h1>
-        <h2 style="color: red">Aguarde e não feche essa janela até a conclusão</h2>
-        <div style="width: 80%; height: 20px; background-color: rgb(134, 138, 165); border-radius: 10px; margin: 20px 10px;">
-          <div style="width: ${percent}%; height: 100%; background-color: rgb(14, 25, 83); border-radius: 10px;"></div>
+        <h1 style="color: rgb(160, 205, 245)">Concluindo a instalação...</h1>
+        <h2 style="color: white">Aguarde e <strong>NÃO FECHE ESSA JANELA</strong> até a conclusão.</h2>
+        <div style="width: 80%; height: 10px; background-color: rgb(14, 25, 83); border-radius: 10px; margin: 20px 10px;">
+          <div style="width: ${percent}%; height: 100%; background-color: rgb(160, 205, 245); border-radius: 10px;"></div>
         </div>
-        <p>${percent}% Completo</p>
+        <p style="color: white"><strong>${percent}%</strong> Completo</p>
+        <p style="color: white">${message}</p>
         <div class="loader"></div>
-        <br>
-        <br>
-        <h3>Últimos Logs</h3>
-        <pre>${log || ''}</pre>
       </body>
     </html>
     `)}
@@ -93,16 +93,16 @@ async function reportError(error) {
   await new Promise(r => setTimeout(r, 500));
 }
 
-async function startAPI(progressWindow, log) {
+async function startAPI(progressWindow) {
   exec('.\\src\\scripts\\api.bat', (error, stdout) => {
     if (error) console.log(error);
     if (stdout) console.log(stdout);
   });
-  progressWindow.loadURL(getHtml('Inicializando a API...', 33, log));
+  progressWindow.loadURL(getHtml('Inicializando a API...', 33));
   await new Promise(r => setTimeout(r, 2000));
-  progressWindow.loadURL(getHtml('API inicializada', 66, log));
+  progressWindow.loadURL(getHtml('API inicializada', 66));
   await new Promise(r => setTimeout(r, 2000));
-  progressWindow.loadURL(getHtml('Abrindo a aplicação...', 100, log));
+  progressWindow.loadURL(getHtml('Abrindo a aplicação...', 100));
   await new Promise(r => setTimeout(r, 2000));
   createMainWindow();
   app.on('activate', () => {
@@ -136,11 +136,10 @@ function createMainWindow() {
 app
   .whenReady()
   .then(async () => {
-    let log = '';
     let needInstall = false;
     let progressWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
+      width: 970,
+      height: 624,
       webPreferences: {
         nodeIntegration: true,
       },
@@ -158,11 +157,10 @@ app
 
       // Check all dependencies to run the app
       await new Promise(resolve => {
-        progressWindow.loadURL(getHtml('Verificando as instalações...', 30, log));
+        progressWindow.loadURL(getHtml('Verificando as instalações...', 30));
         exec('.\\src\\scripts\\check.bat', (error, stdout) => {
           console.log(stdout);
           if (stdout || error) needInstall = true;
-          log = 'Instalações verificadas com sucesso';
           resolve();
         });
       });
@@ -191,7 +189,6 @@ app
               exec('.\\src\\scripts\\clean.bat', (error, stdout) => {
                 if (error) reject(error);
                 console.log(stdout);
-                log = 'Reparação concluída com sucesso';
                 resolve();
               });
             });
@@ -200,41 +197,37 @@ app
         if (action === 0 || action === 1) {
           // Install
           await new Promise((resolve, reject) => {
-            progressWindow.loadURL(getHtml('Verificando a instalação do Sketchup...', 10, log));
+            progressWindow.loadURL(getHtml('Verificando a instalação do Sketchup...', 10));
             exec(`dir ${sketchup_folder}`, async error => {
               if (error) reject('Intalacao do Sketchup não encontrada, verifique se o Sketchup está instalado e sua conta está logada');
-              log = 'Instalação do Sketchup encontrada com sucesso';
               resolve();
             });
           });
           await new Promise((resolve, reject) => {
-            progressWindow.loadURL(getHtml('Configurando o Chocolatey e o Apache...', 40, log));
+            progressWindow.loadURL(getHtml('Configurando o Chocolatey e o Apache...', 40));
             exec('.\\src\\scripts\\apache.bat', (error, stdout) => {
               if (error) reject(error + '\n' + stdout);
-              log = 'Chocolatey e Apache configurados com sucesso';
               console.log(stdout);
               resolve();
             });
           });
           await new Promise((resolve, reject) => {
-            progressWindow.loadURL(getHtml('Instalando o Ruby e configurando materiais...', 60, log));
+            progressWindow.loadURL(getHtml('Instalando o Ruby e configurando materiais...', 60));
             exec('.\\src\\scripts\\ruby.bat', (error, stdout) => {
               if (error) reject(error + '\n' + stdout);
-              log = 'Ruby instalado e materiais setados com sucesso';
               console.log(stdout);
               resolve();
             });
           });
           await new Promise((resolve, reject) => {
-            progressWindow.loadURL(getHtml('Baixando arquivos de ambiente...', 80, log));
+            progressWindow.loadURL(getHtml('Baixando arquivos de ambiente...', 80));
             exec('.\\src\\scripts\\environments.bat', (error, stdout) => {
               if (error) reject(error + '\n' + stdout);
-              log = 'Arquivos de ambiente baixados com sucesso';
               console.log(stdout);
               resolve();
             });
           });
-          startAPI(progressWindow, log);
+          startAPI(progressWindow);
         } else if (action === 2) {
           progressWindow.close();
         }
