@@ -69,9 +69,10 @@ export default function Login() {
         style={{
           backgroundImage: `url(${login_image})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center'
         }}
       >
+        <div className='absolute bg-gradient-to-r from-primary-900 to-primary-400 opacity-80 w-2/4 h-full' />
         <img src={logologin} alt='logo' className='w-1/2 animate-pulse' />
       </div>
       <div className='md:w-2/4 sm:w-full h-screen items-center justify-center flex'>
