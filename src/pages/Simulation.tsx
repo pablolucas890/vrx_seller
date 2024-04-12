@@ -279,27 +279,42 @@ export function Simulation() {
                 onClick={() => handleTouch(touch)}
               />
               {touchTextures.find(el => el.touchID === touch.id)?.textureID && (
-                <>
-                  <img
-                    key={index}
-                    src={`../assets/img/materials/${touchTextures.find(el => el.touchID === touch.id)?.textureID}.png`}
-                    className='absolute z-20 w-10 h-10 border-2 border-black shadow-xl'
-                    style={{ left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`, top: `${touch.y}` }}
-                  />
-                  <SubTitle
-                    key={index}
-                    title={
-                      localTextures.find(el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID)
-                        ?.name || ''
-                    }
-                    className='absolute z-20 font-bold'
-                    style={{
-                      left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) + 3}%`,
-                      top: `${parseInt(touch.y.substring(0, touch.y.length - 1)) + 5}%`,
-                      textShadow: '2px 2px 4px white',
-                    }}
-                  />
-                </>
+                <div
+                  key={index}
+                  className='absolute z-20 w-20 h-16 border-1 border-secondary-600 shadow-xl rounded-xl'
+                  style={{
+                    left: `${parseInt(touch.x.substring(0, touch.x.length - 1)) - 1.7}%`,
+                    top: `${parseInt(touch.y.substring(0, touch.y.length - 1)) + (parseInt(touch.y.substring(0, touch.y.length - 1)) > 20 ? -11 : 6)}%`,
+                  }}
+                >
+                  <div className='w-full h-full p-2 bg-secondary-100 rounded-xl flex flex-col justify-around items-center'>
+                    <img
+                      src={`../assets/img/materials/${touchTextures.find(el => el.touchID === touch.id)?.textureID}.png`}
+                      className='w-16 h-6 rounded-md border-2 border-gray-900'
+                    />
+                    <SubTitle
+                      title={
+                        localTextures
+                          .find(el => el.id === touchTextures.find(el => el.touchID === touch.id)?.textureID)
+                          ?.name?.replace(/_/g, ' ')
+                          ?.substring(0, 14) || ''
+                      }
+                      className='text-secondary-600'
+                      style={{ fontSize: '0.5rem' }}
+                    />
+                    {parseInt(touch.y.substring(0, touch.y.length - 1)) > 20 ? (
+                      <div
+                        className='absolute z-10 w-0 h-0 border-8 border-solid border-transparent border-t-secondary-100'
+                        style={{ left: '40%', top: '100%' }}
+                      />
+                    ) : (
+                      <div
+                        className='absolute z-10 w-0 h-0 border-8 border-solid border-transparent border-b-secondary-100'
+                        style={{ left: '40%', top: '-24%' }}
+                      />
+                    )}
+                  </div>
+                </div>
               )}
             </>
           ))}
@@ -321,18 +336,18 @@ export function Simulation() {
                 className='w-full rounded-2xl mb-4'
                 onChange={e => handleFilterTextures(e.target.value)}
               />
-              <div className='overflow-y-auto h-[600px] w-full'>
+              <div className='overflow-y-auto h-[600px] w-full grid grid-cols-2 gap-4'>
                 {textures.map((texture, index) => (
                   <div key={index} className='w-full mt-2 cursor-pointer'>
                     <img
                       src={`../assets/img/materials/${texture.id}.png`}
                       className={clsx(
                         'rounded-md h-10 w-full border-2 ',
-                        textureSelected?.id === texture.id && 'border-primary-500',
+                        textureSelected?.id === texture.id && 'border-primary-900 shadow-xl',
                       )}
                       onClick={() => handleTexture(texture)}
                     />
-                    <SubTitle title={texture.name} className='text-center text-secondary-600' />
+                    <SubTitle title={texture.name.replace(/_/g, ' ')} className='text-center text-secondary-600' />
                   </div>
                 ))}
               </div>
